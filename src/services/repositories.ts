@@ -1,16 +1,16 @@
-import { Effect, Schema, type ParseResult } from "effect";
-import { GitHubAuthService } from "../infrastructure/auth-service.js";
+import { Effect, type ParseResult, Schema } from "effect";
 import {
 	GitHubApiError,
 	type GitHubAuthError,
 	type GitHubHttpError,
 	GitHubRepositoryError,
 } from "../domain/errors.js";
-import { GitHubHttpClientService } from "../infrastructure/http-client.js";
 import {
 	GitHubRepository,
 	RepositoryListOptions,
 } from "../domain/repository.js";
+import { GitHubAuthService } from "../infrastructure/auth-service.js";
+import { GitHubHttpClientService } from "../infrastructure/http-client.js";
 
 type GitHubListResponseType<T> = {
 	readonly data: readonly T[];

@@ -1,85 +1,42 @@
 # Dependencies
 node_modules/
-.pnpm-store/
 
-# Production builds
+# Build outputs
 dist/
-build/
-out/
-.output/
-.nitro/
+*.tsbuildinfo
 
 # Environment variables
 .env
 .env.local
-.env.production
-.env.development
+.env.*.local
 
-# IDE and editor files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# OS generated files
+# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
 # Logs
-logs/
+logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
+# Coverage reports
 coverage/
-*.lcov
+.nyc_output/
 
-# Electron specific
-# Packaged app
-*.dmg
-*.exe
-*.deb
-*.rpm
-*.snap
-*.AppImage
-
-# Cache
-.cache/
-.parcel-cache/
-.next/
-.nuxt/
-.vite/
-
-# TanStack Start
-.tanstack/
-
-# Auth keys and certificates
-*.pem
-*.key
-*.crt
+# Test artifacts
+tests/fixtures/recordings/*.json
+!tests/fixtures/recordings/.gitkeep
 
 # Temporary files
-tmp/
+.tmp/
 temp/
-*.tmp
-
-# Devbox
-.devbox/
-
-tasks.md
-CLAUDE.local.md

@@ -1,13 +1,12 @@
 // Domain entities
-export * from "./user.js";
-export * from "./repository.js";
-export * from "./notification.js";
 
 // Domain value objects
 export * from "./auth-config.js";
-
 // Domain errors
 export * from "./errors.js";
+export * from "./notification.js";
+export * from "./repository.js";
+export * from "./user.js";
 
 // Common domain types
 import { Schema } from "effect";
