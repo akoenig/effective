@@ -1,5 +1,5 @@
 // HTTP client
-export * from './http-client.js';
+export * from "./http-client.js";
 
 // Authentication service
-export * from './auth-service.js';
+export * from "./auth-service.js";
