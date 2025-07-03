@@ -1,22 +1,27 @@
 {
-  "name": "@akoenig/effect-github",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.10.0",
-  "devDependencies": {
-    "@biomejs/biome": "2.0.6",
-    "@effect/platform-node": "^0.88.10",
-    "typescript": "^5.8.3"
-  },
-  "peerDependencies": {
-    "@effect/platform": "^0.87.6",
-    "effect": "^3.16.12"
-  }
+	"name": "@akoenig/effect-github",
+	"version": "1.0.0",
+	"description": "GitHub SDK for Effect",
+	"scripts": {
+		"lint": "biome lint .",
+		"lint:fix": "biome lint --write .",
+		"format": "biome format .",
+		"format:fix": "biome format --write .",
+		"check": "biome check .",
+		"check:fix": "biome check --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"keywords": [],
+	"author": "André König <andre.koenig@openformation.io>",
+	"license": "MIT",
+	"packageManager": "pnpm@10.10.0",
+	"devDependencies": {
+		"@biomejs/biome": "2.0.6",
+		"@effect/platform-node": "^0.88.10",
+		"typescript": "^5.8.3"
+	},
+	"peerDependencies": {
+		"@effect/platform": "^0.87.6",
+		"effect": "^3.16.12"
+	}
 }
