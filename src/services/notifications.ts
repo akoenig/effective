@@ -1,19 +1,19 @@
-import { Effect, type Schema } from "effect";
-import { GitHubAuthService } from "../infrastructure/auth-service.js";
+import { Effect, type ParseResult, Schema } from "effect";
 import {
 	GitHubApiError,
 	type GitHubAuthError,
 	type GitHubHttpError,
 	GitHubNotificationError,
 } from "../domain/errors.js";
-import { GitHubHttpClientService } from "../infrastructure/http-client.js";
-import type {
+import {
 	GitHubNotification,
-	NotificationListOptions,
+	type NotificationListOptions,
 } from "../domain/notification.js";
+import { GitHubAuthService } from "../infrastructure/auth-service.js";
+import { GitHubHttpClientService } from "../infrastructure/http-client.js";
 
 type GitHubListResponseType<T> = {
-	readonly data: T[];
+	readonly data: readonly T[];
 	readonly totalCount?: number;
 	readonly incompleteResults?: boolean;
 };
@@ -22,7 +22,8 @@ type NotificationServiceError =
 	| GitHubNotificationError
 	| GitHubAuthError
 	| GitHubHttpError
-	| GitHubApiError;
+	| GitHubApiError
+	| ParseResult.ParseError;
 
 /**
  * GitHub Notifications service implementing notification-related API endpoints
@@ -48,12 +49,18 @@ export class NotificationsService extends Effect.Service<NotificationsService>()
 							.map(([key, value]) => [key, String(value)]),
 					);
 
-					const notifications = yield* httpClient.get<
-						Schema.Schema.Type<typeof GitHubNotification>[]
-					>("/notifications", {
-						headers: authHeaders,
-						searchParams,
-					});
+					const rawNotifications = yield* httpClient.get<unknown[]>(
+						"/notifications",
+						{
+							headers: authHeaders,
+							searchParams,
+						},
+					);
+
+					// Decode snake_case response to camelCase
+					const notifications = yield* Schema.decodeUnknown(
+						Schema.Array(GitHubNotification),
+					)(rawNotifications);
 
 					return {
 						data: notifications,
@@ -116,13 +123,10 @@ export class NotificationsService extends Effect.Service<NotificationsService>()
 				Effect.gen(function* () {
 					const authHeaders = yield* auth.getAuthHeaders();
 
-					return yield* httpClient
-						.get<Schema.Schema.Type<typeof GitHubNotification>>(
-							`/notifications/threads/${threadId}`,
-							{
-								headers: authHeaders,
-							},
-						)
+					const rawNotification = yield* httpClient
+						.get<unknown>(`/notifications/threads/${threadId}`, {
+							headers: authHeaders,
+						})
 						.pipe(
 							Effect.mapError((error) => {
 								if (error instanceof GitHubApiError && error.status === 404) {
@@ -135,6 +139,11 @@ export class NotificationsService extends Effect.Service<NotificationsService>()
 								return error;
 							}),
 						);
+
+					// Decode snake_case response to camelCase
+					return yield* Schema.decodeUnknown(GitHubNotification)(
+						rawNotification,
+					);
 				});
 
 			const markThreadAsRead = (

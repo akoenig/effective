@@ -22,6 +22,9 @@ importers:
       '@effect/platform-node':
         specifier: ^0.88.10
         version: 0.88.10(@effect/cluster@0.41.10(@effect/platform@0.87.6(effect@3.16.12))(@effect/rpc@0.64.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/sql@0.40.7(@effect/experimental@0.51.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/workflow@0.4.7(@effect/platform@0.87.6(effect@3.16.12))(@effect/rpc@0.64.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(effect@3.16.12))(effect@3.16.12))(@effect/platform@0.87.6(effect@3.16.12))(@effect/rpc@0.64.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/sql@0.40.7(@effect/experimental@0.51.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(effect@3.16.12)
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.16.0
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -265,6 +268,9 @@ packages:
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
+  '@types/node@22.16.0':
+    resolution: {integrity: sha512-B2egV9wALML1JCpv3VQoQ+yesQKAmNMBIAY7OteVrikcOcAkWm+dGL6qpeCktPjAv6N1JLnhbNiqS35UpFyBsQ==}
+
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
@@ -345,6 +351,9 @@ packages:
     resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
   undici@7.11.0:
     resolution: {integrity: sha512-heTSIac3iLhsmZhUCjyS3JQEkZELateufzZuBaVM5RHXdSBMb1LPMQf5x+FH7qjsZYDP0ttAc3nnVpUB+wYbOg==}
@@ -554,6 +563,10 @@ snapshots:
 
   '@standard-schema/spec@1.0.0': {}
 
+  '@types/node@22.16.0':
+    dependencies:
+      undici-types: 6.21.0
+
   braces@3.0.3:
     dependencies:
       fill-range: 7.1.1
@@ -627,6 +640,8 @@ snapshots:
       is-number: 7.0.0
 
   typescript@5.8.3: {}
+
+  undici-types@6.21.0: {}
 
   undici@7.11.0: {}
 
