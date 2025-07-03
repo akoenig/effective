@@ -9,5 +9,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.10.0"
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.0.6",
+    "@effect/platform-node": "^0.88.10",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "@effect/platform": "^0.87.6",
+    "effect": "^3.16.12"
+  }
 }

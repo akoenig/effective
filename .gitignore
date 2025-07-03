@@ -1,0 +1,85 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Production builds
+dist/
+build/
+out/
+.output/
+.nitro/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Electron specific
+# Packaged app
+*.dmg
+*.exe
+*.deb
+*.rpm
+*.snap
+*.AppImage
+
+# Cache
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vite/
+
+# TanStack Start
+.tanstack/
+
+# Auth keys and certificates
+*.pem
+*.key
+*.crt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Devbox
+.devbox/
+
+tasks.md
+CLAUDE.local.md
