@@ -1,7 +1,6 @@
 # Recording Http Client
 
 - Add a generic type to the redaction function (`unknown` = default)
-- Separate errors in own files
 
 - JS Docs
 - Polishing (readme, jsdocs, no excessive comments, just add necessary exports)

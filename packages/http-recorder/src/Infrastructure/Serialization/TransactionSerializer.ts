@@ -19,9 +19,7 @@ export class TransactionSerializer extends Effect.Service<TransactionSerializer>
        * Serialize a RecordedTransaction to JSON string
        * @since 1.0.0
        */
-      serialize(
-        transaction: RecordedTransaction,
-      ) {
+      serialize(transaction: RecordedTransaction) {
         return Schema.encode(Schema.parseJson(RecordedTransaction))(
           transaction,
         ).pipe(
@@ -40,9 +38,7 @@ export class TransactionSerializer extends Effect.Service<TransactionSerializer>
        * Deserialize a JSON string to RecordedTransaction
        * @since 1.0.0
        */
-      deserialize(
-        content: string,
-      ) {
+      deserialize(content: string) {
         return Schema.decodeUnknown(Schema.parseJson(RecordedTransaction))(
           content,
         ).pipe(Effect.catchAll(() => Effect.succeed(null)));
@@ -64,9 +60,7 @@ export class TransactionSerializer extends Effect.Service<TransactionSerializer>
        * Serialize body content to JSON string
        * @since 1.0.0
        */
-      serializeBody(
-        body: unknown,
-      ) {
+      serializeBody(body: unknown) {
         return Schema.encode(Schema.parseJson(Schema.Unknown))(body).pipe(
           Effect.mapError(
             (error) =>
