@@ -1,9 +1,11 @@
 # Recording Http Client
 
-- Use Predicate for conditions?
+- Add a generic type to the redaction function (`unknown` = default)
+- Separate errors in own files
+
 - JS Docs
 - Polishing (readme, jsdocs, no excessive comments, just add necessary exports)
-
+- License
 
 # GitHub
 
@@ -38,4 +40,19 @@ const program = Effect.gen(function* () {
     NodeHttpClient.layer,
   )
 ))
+```
+
+Bad:
+
+```ts
+  const shouldSkipRedaction = Predicate.isUndefined(config.redactionFn);
+  if (shouldSkipRedaction) {
+```
+
+Good:
+
+```ts
+  const shouldSkipRedaction = Predicate.isUndefined(config.redactionFn);
+
+  if (shouldSkipRedaction) {
 ```
