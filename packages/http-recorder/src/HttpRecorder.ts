@@ -106,34 +106,46 @@ export class HttpRecorder extends Effect.Service<HttpRecorder>()(
         ...(config.excludedHeaders ?? []).map((h: string) => h.toLowerCase()),
       ]);
 
-      const filterHeaders = (
+      function filterHeaders(
         headers: Record<string, string>,
-      ): Record<string, string> => {
+      ): Record<string, string> {
         const filtered: Record<string, string> = {};
+
         for (const [key, value] of Object.entries(headers)) {
           if (!excludedHeaders.has(key.toLowerCase())) {
             filtered[key] = value;
           }
         }
+
         return filtered;
-      };
+      }
 
-      const generateTransactionId = (
+      function createSlug(input: string): string {
+        return input
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/[\s_-]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      }
+
+      function generateTransactionId(
         request: HttpClientRequest.HttpClientRequest,
-      ): string => {
-        const method = request.method;
-        const url = request.url;
+      ): string {
+        const method = request.method.toLowerCase();
+        const urlPath = new URL(request.url).pathname;
+        const sluggedPath = createSlug(urlPath);
         const timestamp = Date.now();
-        return `${method}_${encodeURIComponent(url)}_${timestamp}`;
-      };
+        return `${method}__${sluggedPath}__${timestamp}`;
+      }
 
-      const getRecordingFilePath = (transactionId: string): string => {
+      function getRecordingFilePath(transactionId: string): string {
         return path.join(config.path, `${transactionId}.json`);
-      };
+      }
 
-      const ensureDirectoryExists = (
+      function ensureDirectoryExists(
         dirPath: string,
-      ): Effect.Effect<void, HttpRecorderError> => {
+      ): Effect.Effect<void, HttpRecorderError> {
         return Effect.gen(function* () {
           yield* fs.makeDirectory(dirPath, { recursive: true }).pipe(
             Effect.mapError(
@@ -144,13 +156,13 @@ export class HttpRecorder extends Effect.Service<HttpRecorder>()(
             ),
           );
         });
-      };
+      }
 
-      const recordTransaction = (
+      function recordTransaction(
         request: HttpClientRequest.HttpClientRequest,
         response: HttpClientResponse.HttpClientResponse,
         responseBody: unknown,
-      ): Effect.Effect<void, HttpRecorderError> => {
+      ): Effect.Effect<void, HttpRecorderError> {
         return Effect.gen(function* () {
           const transactionId = generateTransactionId(request);
           const filePath = getRecordingFilePath(transactionId);
@@ -187,14 +199,11 @@ export class HttpRecorder extends Effect.Service<HttpRecorder>()(
               ),
             );
         });
-      };
+      }
 
-      const findMatchingRecording = (
+      function findMatchingRecording(
         request: HttpClientRequest.HttpClientRequest,
-      ): Effect.Effect<
-        RecordedTransaction | null,
-        HttpRecorderError
-      > => {
+      ): Effect.Effect<RecordedTransaction | null, HttpRecorderError> {
         return Effect.gen(function* () {
           const files = yield* fs.readDirectory(config.path).pipe(
             Effect.mapError(
@@ -228,12 +237,12 @@ export class HttpRecorder extends Effect.Service<HttpRecorder>()(
 
           return null;
         });
-      };
+      }
 
-      const createResponseFromRecording = (
+      function createResponseFromRecording(
         transaction: RecordedTransaction,
         request: HttpClientRequest.HttpClientRequest,
-      ): HttpClientResponse.HttpClientResponse => {
+      ): HttpClientResponse.HttpClientResponse {
         const webResponse = new Response(
           typeof transaction.response.body === "string"
             ? transaction.response.body
@@ -245,14 +254,14 @@ export class HttpRecorder extends Effect.Service<HttpRecorder>()(
         );
 
         return HttpClientResponse.fromWeb(request, webResponse);
-      };
+      }
 
-      const execute = (
+      function execute(
         request: HttpClientRequest.HttpClientRequest,
       ): Effect.Effect<
         HttpClientResponse.HttpClientResponse,
         HttpClientError.HttpClientError
-      > => {
+      > {
         return Effect.gen(function* () {
           if (config.mode === "replay") {
             const recording = yield* findMatchingRecording(request).pipe(
@@ -295,7 +304,7 @@ export class HttpRecorder extends Effect.Service<HttpRecorder>()(
 
           return response;
         });
-      };
+      }
 
       return HttpClient.make(execute);
     }),
