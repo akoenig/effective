@@ -1,10 +1,10 @@
 # Effect Packages Monorepo
 
-This repository contains several packages built for the [Effect](https://effect.website/) ecosystem, providing powerful tools and utilities for functional programming in TypeScript.
+This repository contains several packages built for the [Effect](https://effect.website/) ecosystem, providing powerful tools and utilities for Enterprise TypeScript development.
 
 ## Overview
 
-Effect is a powerful TypeScript library for building robust, maintainable applications with functional programming patterns. This monorepo houses various packages that extend Effect's capabilities for different use cases.
+Effect is a powerful TypeScript library designed for building robust, maintainable enterprise applications. This monorepo houses various packages that extend Effect's capabilities for different use cases.
 
 ## Packages
 
@@ -19,9 +19,9 @@ Effect is a powerful TypeScript library for building robust, maintainable applic
 
 - [`github-sdk-example`](./examples/github-sdk-example) - Example usage of the GitHub SDK
 
-## Getting Started
+## Development
 
-This monorepo uses [pnpm](https://pnpm.io/) as the package manager. To get started:
+This monorepo uses [pnpm](https://pnpm.io/) as the package manager. To get started with development:
 
 ```bash
 # Install dependencies
@@ -34,8 +34,6 @@ pnpm build
 pnpm test
 ```
 
-## Development
-
 Each package in this monorepo is independently versioned and can be published separately. See the individual package READMEs for specific development instructions.
 
 ## Contributing
@@ -44,4 +42,4 @@ Contributions are welcome! Please read the individual package documentation for 
 
 ## License
 
-See individual package licenses for details.
+All packages in this monorepo are licensed under the MIT License.
