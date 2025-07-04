@@ -1,10 +1,10 @@
 # Effect Packages Monorepo
 
-This repository contains several packages built for the [Effect](https://effect.website/) ecosystem, providing powerful tools and utilities for Enterprise TypeScript development.
+This repository contains several packages built for the [Effect](https://effect.website/) ecosystem.
 
 ## Overview
 
-Effect is a powerful TypeScript library designed for building robust, maintainable enterprise applications. This monorepo houses various packages that extend Effect's capabilities for different use cases.
+Effect is a powerful TypeScript library designed for building robust, maintainable enterprise-grade applications. This monorepo houses various packages that extend Effect's capabilities for different use cases.
 
 ## Packages
 
