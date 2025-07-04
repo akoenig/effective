@@ -24,9 +24,9 @@ importers:
       '@akoenig/effect-github':
         specifier: workspace:*
         version: link:../../packages/github
-      '@akoenig/effect-http-client-recording':
+      '@akoenig/effect-http-recorder':
         specifier: workspace:*
-        version: link:../../packages/http-client-recording
+        version: link:../../packages/http-recorder
       '@effect/platform':
         specifier: ^0.87.6
         version: 0.87.6(effect@3.16.12)
@@ -50,14 +50,14 @@ importers:
         specifier: ^3.16.12
         version: 3.16.12
     devDependencies:
-      '@akoenig/effect-http-client-recording':
+      '@akoenig/effect-http-recorder':
         specifier: workspace:*
-        version: link:../http-client-recording
+        version: link:../http-recorder
       '@effect/platform-node':
         specifier: ^0.88.10
         version: 0.88.10(@effect/cluster@0.41.10(@effect/platform@0.87.6(effect@3.16.12))(@effect/rpc@0.64.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/sql@0.40.7(@effect/experimental@0.51.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/workflow@0.4.7(@effect/platform@0.87.6(effect@3.16.12))(@effect/rpc@0.64.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(effect@3.16.12))(effect@3.16.12))(@effect/platform@0.87.6(effect@3.16.12))(@effect/rpc@0.64.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/sql@0.40.7(@effect/experimental@0.51.7(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(@effect/platform@0.87.6(effect@3.16.12))(effect@3.16.12))(effect@3.16.12)
 
-  packages/http-client-recording:
+  packages/http-recorder:
     dependencies:
       '@effect/platform':
         specifier: ^0.87.6

@@ -1,5 +1,5 @@
 {
-  "name": "@akoenig/effect-http-client-recording",
+  "name": "@akoenig/effect-http-recorder",
   "version": "1.0.0",
   "description": "HTTP client recording and replay capabilities for Effect",
   "type": "module",

@@ -1,5 +1,5 @@
 import { GitHub, RepositoriesService } from "@akoenig/effect-github";
-import { createRecordingHttpClientLayer } from "@akoenig/effect-http-client-recording";
+import { createRecordingHttpClientLayer } from "@akoenig/effect-http-recorder";
 import { HttpClient } from "@effect/platform";
 import { NodeHttpClient } from "@effect/platform-node";
 import { Config, Effect, Layer } from "effect";

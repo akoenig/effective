@@ -31,7 +31,7 @@
     "effect": "^3.16.12"
   },
   "devDependencies": {
-    "@akoenig/effect-http-client-recording": "workspace:*",
+    "@akoenig/effect-http-recorder": "workspace:*",
     "@effect/platform-node": "^0.88.10"
   }
 }
