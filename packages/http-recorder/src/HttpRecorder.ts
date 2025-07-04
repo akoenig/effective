@@ -1,4 +1,9 @@
 /**
+ * @fileoverview HTTP Recorder - Core recording and replay functionality
+ * 
+ * This module provides the main HttpRecorder implementation for recording and replaying
+ * HTTP requests and responses in Effect applications.
+ * 
  * @since 1.0.0
  */
 import type { HttpClientRequest } from "@effect/platform";
@@ -25,7 +30,9 @@ import { RedactionService } from "./Services/RedactionService.js";
 import { ReplayService } from "./Services/ReplayService.js";
 
 /**
+ * Default headers that are excluded from recordings for security purposes
  * @since 1.0.0
+ * @category constants
  * @internal
  */
 const DEFAULT_EXCLUDED_HEADERS = [
@@ -42,15 +49,22 @@ const DEFAULT_EXCLUDED_HEADERS = [
 ] as const;
 
 /**
+ * Checks if the recorder is in replay mode
  * @since 1.0.0
  * @category predicates
  * @internal
+ * @param mode - The recorder mode to check
+ * @returns True if mode is "replay"
  */
 const isReplayMode = (mode: string): boolean => mode === "replay";
 
 /**
+ * Creates the main HttpRecorder layer that intercepts HTTP requests
  * @since 1.0.0
+ * @category layers
  * @internal
+ * @param config - Configuration for the HTTP recorder
+ * @returns Effect layer that provides HTTP recording/replay functionality
  */
 const layer = (config: HttpRecorderConfig) =>
   Layer.effect(
@@ -153,8 +167,30 @@ const layer = (config: HttpRecorderConfig) =>
   );
 
 /**
+ * Creates an HTTP recorder layer with dynamic header support
  * @since 1.0.0
  * @category layers
+ * @param options - Configuration options for the recorder
+ * @param options.path - Directory path where recordings will be stored
+ * @param options.mode - Recording mode: "record" to save interactions, "replay" to use saved recordings
+ * @param options.excludedHeaders - Optional array of header names to exclude from recordings
+ * @param options.redactionFn - Optional function to redact sensitive data from requests/responses
+ * @param options.headers - Record of header names to Config values for dynamic header resolution
+ * @returns Effect layer that provides HTTP recording/replay functionality
+ * @example
+ * ```typescript
+ * import { Config } from "effect";
+ * 
+ * const recorder = HttpRecorder.layerWithHeaders({
+ *   path: "./recordings",
+ *   mode: "record",
+ *   excludedHeaders: ["x-sensitive-header"],
+ *   headers: {
+ *     "X-API-Key": Config.string("API_KEY"),
+ *     "User-Agent": Config.succeed("MyApp/1.0")
+ *   }
+ * });
+ * ```
  */
 export const layerWithHeaders = (options: {
   path: string;
@@ -165,28 +201,90 @@ export const layerWithHeaders = (options: {
 }) => layer(HttpRecorderConfig.make(options));
 
 /**
+ * HttpRecorder namespace containing the main API for HTTP request/response recording and replay
+ * 
+ * This namespace provides layers for creating HTTP recorders that can intercept, record, and replay
+ * HTTP interactions in Effect applications. It supports various configuration options including
+ * custom redaction functions, header exclusion, and dynamic header resolution.
+ * 
  * @since 1.0.0
  * @category namespace
- * @summary HttpRecorder - Main API for HTTP request/response recording and replay
- *
- * Public API includes:
- *
- * - HttpRecorder.layer() - Create recorder layer
- * - HttpRecorder.layerWithHeaders() - Create recorder layer with headers support
- * - RedactionFunction type - For custom redaction logic
- * - RedactionContext/RedactionResult classes - Redaction data structures
- * - HttpRecorderConfig class - Configuration schema
- * - Specific error classes - Detailed error handling
+ * @example
+ * ```typescript
+ * import { HttpRecorder } from "@akoenig/effect-http-recorder";
+ * import { HttpClient } from "@effect/platform";
+ * import { NodeHttpClient } from "@effect/platform-node";
+ * import { Effect, Layer } from "effect";
+ * 
+ * // Basic usage
+ * const recorder = HttpRecorder.layer({
+ *   path: "./recordings",
+ *   mode: "record"
+ * });
+ * 
+ * // With custom redaction
+ * const recorderWithRedaction = HttpRecorder.layer({
+ *   path: "./recordings",
+ *   mode: "record",
+ *   redactionFn: (context) => ({
+ *     headers: context.headers,
+ *     body: context.type === "request" ? "***REDACTED***" : context.body
+ *   })
+ * });
+ * 
+ * // Use in your application
+ * const program = Effect.gen(function* () {
+ *   const http = yield* HttpClient.HttpClient;
+ *   return yield* http.get("https://api.example.com/data");
+ * }).pipe(
+ *   Effect.provide(Layer.provideMerge(recorder, NodeHttpClient.layer))
+ * );
+ * ```
  */
 export const HttpRecorder = {
   /**
+   * Creates an HTTP recorder layer with static configuration
    * @since 1.0.0
    * @category layers
+   * @param config - Configuration options for the recorder
+   * @param config.path - Directory path where recordings will be stored
+   * @param config.mode - Recording mode: "record" to save interactions, "replay" to use saved recordings
+   * @param config.excludedHeaders - Optional array of header names to exclude from recordings
+   * @param config.redactionFn - Optional function to redact sensitive data from requests/responses
+   * @returns Effect layer that provides HTTP recording/replay functionality
+   * @example
+   * ```typescript
+   * const recorder = HttpRecorder.layer({
+   *   path: "./recordings",
+   *   mode: "record",
+   *   excludedHeaders: ["authorization", "x-api-key"],
+   *   redactionFn: (context) => ({
+   *     headers: context.headers,
+   *     body: context.body
+   *   })
+   * });
+   * ```
    */
   layer,
   /**
+   * Creates an HTTP recorder layer with dynamic header support
    * @since 1.0.0
    * @category layers
+   * @param options - Configuration options including dynamic headers
+   * @returns Effect layer that provides HTTP recording/replay functionality
+   * @example
+   * ```typescript
+   * import { Config } from "effect";
+   * 
+   * const recorder = HttpRecorder.layerWithHeaders({
+   *   path: "./recordings",
+   *   mode: "record",
+   *   headers: {
+   *     "Authorization": Config.string("AUTH_TOKEN"),
+   *     "X-Client-Version": Config.succeed("1.0.0")
+   *   }
+   * });
+   * ```
    */
   layerWithHeaders,
 } as const;
