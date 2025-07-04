@@ -66,9 +66,7 @@ export class HeaderService extends Effect.Service<HeaderService>()(
        * Merge multiple header objects with precedence
        * @since 1.0.0
        */
-      mergeHeaders(
-        ...headerObjects: Array<Record<string, string>>
-      ) {
+      mergeHeaders(...headerObjects: Array<Record<string, string>>) {
         return Object.assign({}, ...headerObjects);
       },
 

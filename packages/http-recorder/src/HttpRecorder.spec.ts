@@ -1,5 +1,10 @@
 import { FileSystem, HttpBody, HttpClient, Path } from "@effect/platform";
-import { NodeContext, NodeFileSystem, NodeHttpClient, NodePath } from "@effect/platform-node";
+import {
+  NodeContext,
+  NodeFileSystem,
+  NodeHttpClient,
+  NodePath,
+} from "@effect/platform-node";
 import { afterAll, describe, expect, it } from "@effect/vitest";
 import { Config, Effect, Layer } from "effect";
 import { HttpRecorder, type RedactionContext } from "./HttpRecorder.js";
@@ -12,7 +17,8 @@ const NodeLayer = Layer.mergeAll(
 );
 
 const rootTestRecordingsPath = "./test-recordings";
-const getTestRecordingsPath = (testName: string) => `${rootTestRecordingsPath}/${testName}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+const getTestRecordingsPath = (testName: string) =>
+  `${rootTestRecordingsPath}/${testName}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 const testUrl = "https://jsonplaceholder.typicode.com/users/1/posts";
 
 describe("HttpRecorder", () => {
@@ -24,71 +30,73 @@ describe("HttpRecorder", () => {
       if (exists) {
         yield* fs.remove(rootTestRecordingsPath, { recursive: true });
       }
-    }).pipe(
-      Effect.provide(NodeFileSystem.layer),
-      Effect.runPromise
-    ).catch(() => {
-      // Ignore cleanup errors
-    });
+    })
+      .pipe(Effect.provide(NodeFileSystem.layer), Effect.runPromise)
+      .catch(() => {
+        // Ignore cleanup errors
+      });
   });
 
   describe("Record Mode", () => {
-    it.effect("should record GET requests with correct file name format", () => {
-      const testRecordingsPath = getTestRecordingsPath("get-format");
-      return Effect.gen(function* () {
-        const client = yield* HttpClient.HttpClient;
-        const fs = yield* FileSystem.FileSystem;
-        const path = yield* Path.Path;
+    it.effect(
+      "should record GET requests with correct file name format",
+      () => {
+        const testRecordingsPath = getTestRecordingsPath("get-format");
+        return Effect.gen(function* () {
+          const client = yield* HttpClient.HttpClient;
+          const fs = yield* FileSystem.FileSystem;
+          const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
-        yield* fs.exists(testRecordingsPath).pipe(
-          Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+          // Clean up any existing test subdirectory
+          yield* fs.exists(testRecordingsPath).pipe(
+            Effect.flatMap((exists) =>
+              exists
+                ? fs.remove(testRecordingsPath)
+                : Effect.succeed(undefined),
+            ),
+            Effect.catchAll(() => Effect.succeed(undefined)),
+          );
+
+          // Ensure test subdirectory exists
+          yield* fs
+            .makeDirectory(testRecordingsPath, { recursive: true })
+            .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+
+          const response = yield* client.get(testUrl);
+          expect(response.status).toBe(200);
+
+          // Verify recording file was created with correct format
+          const files = yield* fs.readDirectory(testRecordingsPath);
+          const recordingFiles = files.filter((f) => f.endsWith(".json"));
+          expect(recordingFiles.length).toBe(1);
+
+          // Verify file name follows format: <timestamp>__<verb>_<slug>
+          const fileName = recordingFiles[0] as string;
+          expect(fileName).toMatch(/^\d+__GET_users-1-posts\.json$/);
+
+          // Verify file content
+          const filePath = path.join(testRecordingsPath, fileName);
+          const content = yield* fs.readFileString(filePath);
+          const transaction = JSON.parse(content);
+
+          expect(transaction.request.method).toBe("GET");
+          expect(transaction.request.url).toBe(testUrl);
+          expect(transaction.response.status).toBe(200);
+          expect(transaction.timestamp).toBeDefined();
+          expect(transaction.id).toMatch(/^\d+__GET_users-1-posts$/);
+        }).pipe(
+          Effect.provide(
+            Layer.provideMerge(
+              HttpRecorder.layer({
+                path: testRecordingsPath,
+                mode: "record",
+              }),
+              NodeLayer,
+            ),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
         );
-        
-        // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
-
-        const response = yield* client.get(testUrl);
-        expect(response.status).toBe(200);
-
-        // Verify recording file was created with correct format
-        const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
-        expect(recordingFiles.length).toBe(1);
-
-        // Verify file name follows format: <timestamp>__<verb>_<slug>
-        const fileName = recordingFiles[0] as string;
-        expect(fileName).toMatch(/^\d+__GET_users-1-posts\.json$/);
-
-        // Verify file content
-        const filePath = path.join(testRecordingsPath, fileName);
-        const content = yield* fs.readFileString(filePath);
-        const transaction = JSON.parse(content);
-
-        expect(transaction.request.method).toBe("GET");
-        expect(transaction.request.url).toBe(testUrl);
-        expect(transaction.response.status).toBe(200);
-        expect(transaction.timestamp).toBeDefined();
-        expect(transaction.id).toMatch(/^\d+__GET_users-1-posts$/);
-      }).pipe(
-        Effect.provide(
-          Layer.provideMerge(
-            HttpRecorder.layer({
-              path: testRecordingsPath,
-              mode: "record",
-            }),
-            NodeLayer,
-          ),
-        ),
-      );
-    });
+      },
+    );
 
     it.effect("should record POST requests with body data", () => {
       const testRecordingsPath = getTestRecordingsPath("post-body");
@@ -97,20 +105,18 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         const postData = {
           title: "Test Post",
@@ -118,18 +124,21 @@ describe("HttpRecorder", () => {
           userId: 1,
         };
 
-        const response = yield* client.post("https://jsonplaceholder.typicode.com/posts", {
-          body: HttpBody.text(JSON.stringify(postData)),
-          headers: {
-            "Content-Type": "application/json",
+        const response = yield* client.post(
+          "https://jsonplaceholder.typicode.com/posts",
+          {
+            body: HttpBody.text(JSON.stringify(postData)),
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
 
         expect(response.status).toBe(201);
 
         // Verify recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(1);
 
         // Verify file name follows format for POST
@@ -164,24 +173,22 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         const response = yield* client.get(testUrl, {
           headers: {
-            "Authorization": "Bearer secret-token",
+            Authorization: "Bearer secret-token",
             "X-API-Key": "secret-key",
             "Content-Type": "application/json",
           },
@@ -191,11 +198,14 @@ describe("HttpRecorder", () => {
 
         // Verify recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(1);
 
         // Verify sensitive headers are excluded
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
+        const filePath = path.join(
+          testRecordingsPath,
+          recordingFiles[0] as string,
+        );
         const content = yield* fs.readFileString(filePath);
         const transaction = JSON.parse(content);
 
@@ -222,20 +232,18 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         const response = yield* client.get(testUrl, {
           headers: {
@@ -248,15 +256,20 @@ describe("HttpRecorder", () => {
 
         // Verify recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(1);
 
         // Verify custom header is excluded
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
+        const filePath = path.join(
+          testRecordingsPath,
+          recordingFiles[0] as string,
+        );
         const content = yield* fs.readFileString(filePath);
         const transaction = JSON.parse(content);
 
-        expect(transaction.request.headers).not.toHaveProperty("x-custom-header");
+        expect(transaction.request.headers).not.toHaveProperty(
+          "x-custom-header",
+        );
         expect(transaction.request.headers).toHaveProperty("content-type");
       }).pipe(
         Effect.provide(
@@ -291,35 +304,39 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         const response = yield* client.get(testUrl);
         expect(response.status).toBe(200);
 
         // Verify recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(1);
 
         // Verify redaction was applied
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
+        const filePath = path.join(
+          testRecordingsPath,
+          recordingFiles[0] as string,
+        );
         const content = yield* fs.readFileString(filePath);
         const transaction = JSON.parse(content);
 
-        expect(transaction.request.headers).toHaveProperty("x-redacted", "true");
+        expect(transaction.request.headers).toHaveProperty(
+          "x-redacted",
+          "true",
+        );
         expect(transaction.response.body).toEqual({ redacted: true });
       }).pipe(
         Effect.provide(
@@ -343,20 +360,18 @@ describe("HttpRecorder", () => {
         const client = yield* HttpClient.HttpClient;
         const fs = yield* FileSystem.FileSystem;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         // First, record a transaction
         const recordClient = yield* Effect.provide(
@@ -400,25 +415,23 @@ describe("HttpRecorder", () => {
         const client = yield* HttpClient.HttpClient;
         const fs = yield* FileSystem.FileSystem;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
-        
-        // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
 
+        // Ensure test subdirectory exists
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+
         // Try to replay a request that wasn't recorded
-        const result = yield* client.get("https://jsonplaceholder.typicode.com/users/999").pipe(
-          Effect.either
-        );
+        const result = yield* client
+          .get("https://jsonplaceholder.typicode.com/users/999")
+          .pipe(Effect.either);
 
         expect(result._tag).toBe("Left");
       }).pipe(
@@ -439,10 +452,22 @@ describe("HttpRecorder", () => {
     it("should generate correct file names for various URL patterns", () => {
       // Test various URL patterns
       const testCases = [
-        { url: "https://api.example.com/users", expected: /^\d+__GET_users\.json$/ },
-        { url: "https://api.example.com/users/123", expected: /^\d+__GET_users-123\.json$/ },
-        { url: "https://api.example.com/users/123/posts", expected: /^\d+__GET_users-123-posts\.json$/ },
-        { url: "https://api.example.com/api/v1/users", expected: /^\d+__GET_api-v1-users\.json$/ },
+        {
+          url: "https://api.example.com/users",
+          expected: /^\d+__GET_users\.json$/,
+        },
+        {
+          url: "https://api.example.com/users/123",
+          expected: /^\d+__GET_users-123\.json$/,
+        },
+        {
+          url: "https://api.example.com/users/123/posts",
+          expected: /^\d+__GET_users-123-posts\.json$/,
+        },
+        {
+          url: "https://api.example.com/api/v1/users",
+          expected: /^\d+__GET_api-v1-users\.json$/,
+        },
       ];
 
       for (const testCase of testCases) {
@@ -452,10 +477,10 @@ describe("HttpRecorder", () => {
         const expectedSlug = urlPath
           .toLowerCase()
           .trim()
-          .replace(/\//g, '-')
-          .replace(/[^\w\s-]/g, '')
-          .replace(/[\s_-]+/g, '-')
-          .replace(/^-+|-+$/g, '');
+          .replace(/\//g, "-")
+          .replace(/[^\w\s-]/g, "")
+          .replace(/[\s_-]+/g, "-")
+          .replace(/^-+|-+$/g, "");
 
         const timestamp = Date.now();
         const generatedId = `${timestamp}__GET_${expectedSlug}`;
@@ -473,51 +498,67 @@ describe("HttpRecorder", () => {
         const client = yield* HttpClient.HttpClient;
         const fs = yield* FileSystem.FileSystem;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
-        
-        // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
 
+        // Ensure test subdirectory exists
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+
         // Test POST request
-        const postResponse = yield* client.post("https://jsonplaceholder.typicode.com/posts", {
-          body: HttpBody.text(JSON.stringify({ title: "Test", body: "Test body", userId: 1 })),
-          headers: { "Content-Type": "application/json" },
-        });
+        const postResponse = yield* client.post(
+          "https://jsonplaceholder.typicode.com/posts",
+          {
+            body: HttpBody.text(
+              JSON.stringify({ title: "Test", body: "Test body", userId: 1 }),
+            ),
+            headers: { "Content-Type": "application/json" },
+          },
+        );
         expect(postResponse.status).toBe(201);
 
         // Test PUT request
-        const putResponse = yield* client.put("https://jsonplaceholder.typicode.com/posts/1", {
-          body: HttpBody.text(JSON.stringify({ id: 1, title: "Updated", body: "Updated body", userId: 1 })),
-          headers: { "Content-Type": "application/json" },
-        });
+        const putResponse = yield* client.put(
+          "https://jsonplaceholder.typicode.com/posts/1",
+          {
+            body: HttpBody.text(
+              JSON.stringify({
+                id: 1,
+                title: "Updated",
+                body: "Updated body",
+                userId: 1,
+              }),
+            ),
+            headers: { "Content-Type": "application/json" },
+          },
+        );
         expect(putResponse.status).toBe(200);
 
         // Test PATCH request (since DELETE is not available)
-        const patchResponse = yield* client.patch("https://jsonplaceholder.typicode.com/posts/1", {
-          body: HttpBody.text(JSON.stringify({ title: "Patched" })),
-          headers: { "Content-Type": "application/json" },
-        });
+        const patchResponse = yield* client.patch(
+          "https://jsonplaceholder.typicode.com/posts/1",
+          {
+            body: HttpBody.text(JSON.stringify({ title: "Patched" })),
+            headers: { "Content-Type": "application/json" },
+          },
+        );
         expect(patchResponse.status).toBe(200);
 
         // Verify all requests were recorded
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(3);
 
         // Verify file names contain correct HTTP methods
-        const postFile = recordingFiles.find(f => f.includes('POST'));
-        const putFile = recordingFiles.find(f => f.includes('PUT'));
-        const patchFile = recordingFiles.find(f => f.includes('PATCH'));
+        const postFile = recordingFiles.find((f) => f.includes("POST"));
+        const putFile = recordingFiles.find((f) => f.includes("PUT"));
+        const patchFile = recordingFiles.find((f) => f.includes("PATCH"));
 
         expect(postFile).toBeDefined();
         expect(putFile).toBeDefined();
@@ -544,36 +585,43 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         const response = yield* client.get(testUrl);
         expect(response.status).toBe(200);
 
         // Verify recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(1);
 
         // Verify headers were applied
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
+        const filePath = path.join(
+          testRecordingsPath,
+          recordingFiles[0] as string,
+        );
         const content = yield* fs.readFileString(filePath);
         const transaction = JSON.parse(content);
 
-        expect(transaction.request.headers).toHaveProperty("x-custom-header", "test-custom-value");
-        expect(transaction.request.headers).toHaveProperty("x-service-id", "test-service-123");
+        expect(transaction.request.headers).toHaveProperty(
+          "x-custom-header",
+          "test-custom-value",
+        );
+        expect(transaction.request.headers).toHaveProperty(
+          "x-service-id",
+          "test-service-123",
+        );
       }).pipe(
         Effect.provide(
           Layer.provideMerge(
@@ -598,36 +646,43 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         const response = yield* client.get(testUrl);
         expect(response.status).toBe(200);
 
         // Verify recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(1);
 
         // Verify headers were applied
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
+        const filePath = path.join(
+          testRecordingsPath,
+          recordingFiles[0] as string,
+        );
         const content = yield* fs.readFileString(filePath);
         const transaction = JSON.parse(content);
 
-        expect(transaction.request.headers).toHaveProperty("x-client-id", "env-client-id");
-        expect(transaction.request.headers).toHaveProperty("x-service-name", "test-service");
+        expect(transaction.request.headers).toHaveProperty(
+          "x-client-id",
+          "env-client-id",
+        );
+        expect(transaction.request.headers).toHaveProperty(
+          "x-service-name",
+          "test-service",
+        );
       }).pipe(
         Effect.provide(
           Layer.provideMerge(
@@ -635,8 +690,12 @@ describe("HttpRecorder", () => {
               path: testRecordingsPath,
               mode: "record",
               headers: {
-                "x-client-id": Config.string("TEST_CLIENT_ID").pipe(Config.withDefault("env-client-id")),
-                "x-service-name": Config.string("SERVICE_NAME").pipe(Config.withDefault("test-service")),
+                "x-client-id": Config.string("TEST_CLIENT_ID").pipe(
+                  Config.withDefault("env-client-id"),
+                ),
+                "x-service-name": Config.string("SERVICE_NAME").pipe(
+                  Config.withDefault("test-service"),
+                ),
               },
             }),
             NodeLayer,
@@ -645,65 +704,80 @@ describe("HttpRecorder", () => {
       );
     });
 
-    it.effect("should merge recorder headers with request headers, request takes precedence", () => {
-      const testRecordingsPath = getTestRecordingsPath("header-precedence");
-      return Effect.gen(function* () {
-        const client = yield* HttpClient.HttpClient;
-        const fs = yield* FileSystem.FileSystem;
-        const path = yield* Path.Path;
+    it.effect(
+      "should merge recorder headers with request headers, request takes precedence",
+      () => {
+        const testRecordingsPath = getTestRecordingsPath("header-precedence");
+        return Effect.gen(function* () {
+          const client = yield* HttpClient.HttpClient;
+          const fs = yield* FileSystem.FileSystem;
+          const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
-        yield* fs.exists(testRecordingsPath).pipe(
-          Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+          // Clean up any existing test subdirectory
+          yield* fs.exists(testRecordingsPath).pipe(
+            Effect.flatMap((exists) =>
+              exists
+                ? fs.remove(testRecordingsPath)
+                : Effect.succeed(undefined),
+            ),
+            Effect.catchAll(() => Effect.succeed(undefined)),
+          );
+
+          // Ensure test subdirectory exists
+          yield* fs
+            .makeDirectory(testRecordingsPath, { recursive: true })
+            .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+
+          const response = yield* client.get(testUrl, {
+            headers: {
+              "x-client-id": "request-client-id", // This should override the recorder header
+              "content-type": "application/json", // This should be added to recorder headers
+            },
+          });
+          expect(response.status).toBe(200);
+
+          // Verify recording file was created
+          const files = yield* fs.readDirectory(testRecordingsPath);
+          const recordingFiles = files.filter((f) => f.endsWith(".json"));
+          expect(recordingFiles.length).toBe(1);
+
+          // Verify header precedence
+          const filePath = path.join(
+            testRecordingsPath,
+            recordingFiles[0] as string,
+          );
+          const content = yield* fs.readFileString(filePath);
+          const transaction = JSON.parse(content);
+
+          expect(transaction.request.headers).toHaveProperty(
+            "x-client-id",
+            "request-client-id",
+          ); // Request header wins
+          expect(transaction.request.headers).toHaveProperty(
+            "x-service-token",
+            "recorder-token",
+          ); // Recorder header preserved
+          expect(transaction.request.headers).toHaveProperty(
+            "content-type",
+            "application/json",
+          ); // Request header added
+        }).pipe(
+          Effect.provide(
+            Layer.provideMerge(
+              HttpRecorder.layerWithHeaders({
+                path: testRecordingsPath,
+                mode: "record",
+                headers: {
+                  "x-client-id": Config.succeed("recorder-client-id"),
+                  "x-service-token": Config.succeed("recorder-token"),
+                },
+              }),
+              NodeLayer,
+            ),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
         );
-        
-        // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
-
-        const response = yield* client.get(testUrl, {
-          headers: {
-            "x-client-id": "request-client-id", // This should override the recorder header
-            "content-type": "application/json", // This should be added to recorder headers
-          },
-        });
-        expect(response.status).toBe(200);
-
-        // Verify recording file was created
-        const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
-        expect(recordingFiles.length).toBe(1);
-
-        // Verify header precedence
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
-        const content = yield* fs.readFileString(filePath);
-        const transaction = JSON.parse(content);
-
-        expect(transaction.request.headers).toHaveProperty("x-client-id", "request-client-id"); // Request header wins
-        expect(transaction.request.headers).toHaveProperty("x-service-token", "recorder-token"); // Recorder header preserved
-        expect(transaction.request.headers).toHaveProperty("content-type", "application/json"); // Request header added
-      }).pipe(
-        Effect.provide(
-          Layer.provideMerge(
-            HttpRecorder.layerWithHeaders({
-              path: testRecordingsPath,
-              mode: "record",
-              headers: {
-                "x-client-id": Config.succeed("recorder-client-id"),
-                "x-service-token": Config.succeed("recorder-token"),
-              },
-            }),
-            NodeLayer,
-          ),
-        ),
-      );
-    });
+      },
+    );
 
     it.effect("should apply headers in replay mode", () => {
       const testRecordingsPath = getTestRecordingsPath("replay-headers");
@@ -711,20 +785,18 @@ describe("HttpRecorder", () => {
         const client = yield* HttpClient.HttpClient;
         const fs = yield* FileSystem.FileSystem;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         // First, record a transaction with headers
         const recordClient = yield* Effect.provide(
@@ -777,37 +849,40 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
 
-        // Clean up any existing test subdirectory  
+        // Clean up any existing test subdirectory
         yield* fs.exists(testRecordingsPath).pipe(
           Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
+            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
           ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+          Effect.catchAll(() => Effect.succeed(undefined)),
         );
-        
+
         // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        yield* fs
+          .makeDirectory(testRecordingsPath, { recursive: true })
+          .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
         const response = yield* client.get(testUrl);
         expect(response.status).toBe(200);
 
         // Verify recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
+        const recordingFiles = files.filter((f) => f.endsWith(".json"));
         expect(recordingFiles.length).toBe(1);
 
         // Verify no extra headers were added
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
+        const filePath = path.join(
+          testRecordingsPath,
+          recordingFiles[0] as string,
+        );
         const content = yield* fs.readFileString(filePath);
         const transaction = JSON.parse(content);
 
         // Should not have any recorder-specific headers
         expect(transaction.request.headers).not.toHaveProperty("x-client-id");
-        expect(transaction.request.headers).not.toHaveProperty("x-service-token");
+        expect(transaction.request.headers).not.toHaveProperty(
+          "x-service-token",
+        );
       }).pipe(
         Effect.provide(
           Layer.provideMerge(
@@ -822,111 +897,133 @@ describe("HttpRecorder", () => {
       );
     });
 
-    it.effect("should apply headers but still exclude sensitive headers by default", () => {
-      const testRecordingsPath = getTestRecordingsPath("sensitive-with-headers");
-      return Effect.gen(function* () {
-        const client = yield* HttpClient.HttpClient;
-        const fs = yield* FileSystem.FileSystem;
-        const path = yield* Path.Path;
-
-        // Clean up any existing test subdirectory  
-        yield* fs.exists(testRecordingsPath).pipe(
-          Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
-          ),
-          Effect.catchAll(() => Effect.succeed(undefined))
+    it.effect(
+      "should apply headers but still exclude sensitive headers by default",
+      () => {
+        const testRecordingsPath = getTestRecordingsPath(
+          "sensitive-with-headers",
         );
-        
-        // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+        return Effect.gen(function* () {
+          const client = yield* HttpClient.HttpClient;
+          const fs = yield* FileSystem.FileSystem;
+          const path = yield* Path.Path;
 
-        const response = yield* client.get(testUrl, {
-          headers: {
-            "Authorization": "Bearer should-be-excluded",
-            "X-API-Key": "should-be-excluded",
-            "Content-Type": "application/json",
-          },
-        });
-        expect(response.status).toBe(200);
+          // Clean up any existing test subdirectory
+          yield* fs.exists(testRecordingsPath).pipe(
+            Effect.flatMap((exists) =>
+              exists
+                ? fs.remove(testRecordingsPath)
+                : Effect.succeed(undefined),
+            ),
+            Effect.catchAll(() => Effect.succeed(undefined)),
+          );
 
-        // Verify recording file was created
-        const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
-        expect(recordingFiles.length).toBe(1);
+          // Ensure test subdirectory exists
+          yield* fs
+            .makeDirectory(testRecordingsPath, { recursive: true })
+            .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
-        // Verify headers were applied correctly
-        const filePath = path.join(testRecordingsPath, recordingFiles[0] as string);
-        const content = yield* fs.readFileString(filePath);
-        const transaction = JSON.parse(content);
+          const response = yield* client.get(testUrl, {
+            headers: {
+              Authorization: "Bearer should-be-excluded",
+              "X-API-Key": "should-be-excluded",
+              "Content-Type": "application/json",
+            },
+          });
+          expect(response.status).toBe(200);
 
-        // Sensitive headers should be excluded
-        expect(transaction.request.headers).not.toHaveProperty("authorization");
-        expect(transaction.request.headers).not.toHaveProperty("x-api-key");
-        
-        // Non-sensitive headers should be included
-        expect(transaction.request.headers).toHaveProperty("content-type", "application/json");
-        expect(transaction.request.headers).toHaveProperty("x-custom-app", "test-app");
-        expect(transaction.request.headers).toHaveProperty("x-version", "1.0.0");
-      }).pipe(
-        Effect.provide(
-          Layer.provideMerge(
-            HttpRecorder.layerWithHeaders({
-              path: testRecordingsPath,
-              mode: "record",
-              headers: {
-                "x-custom-app": Config.succeed("test-app"),
-                "x-version": Config.succeed("1.0.0"),
-              },
-            }),
-            NodeLayer,
+          // Verify recording file was created
+          const files = yield* fs.readDirectory(testRecordingsPath);
+          const recordingFiles = files.filter((f) => f.endsWith(".json"));
+          expect(recordingFiles.length).toBe(1);
+
+          // Verify headers were applied correctly
+          const filePath = path.join(
+            testRecordingsPath,
+            recordingFiles[0] as string,
+          );
+          const content = yield* fs.readFileString(filePath);
+          const transaction = JSON.parse(content);
+
+          // Sensitive headers should be excluded
+          expect(transaction.request.headers).not.toHaveProperty(
+            "authorization",
+          );
+          expect(transaction.request.headers).not.toHaveProperty("x-api-key");
+
+          // Non-sensitive headers should be included
+          expect(transaction.request.headers).toHaveProperty(
+            "content-type",
+            "application/json",
+          );
+          expect(transaction.request.headers).toHaveProperty(
+            "x-custom-app",
+            "test-app",
+          );
+          expect(transaction.request.headers).toHaveProperty(
+            "x-version",
+            "1.0.0",
+          );
+        }).pipe(
+          Effect.provide(
+            Layer.provideMerge(
+              HttpRecorder.layerWithHeaders({
+                path: testRecordingsPath,
+                mode: "record",
+                headers: {
+                  "x-custom-app": Config.succeed("test-app"),
+                  "x-version": Config.succeed("1.0.0"),
+                },
+              }),
+              NodeLayer,
+            ),
           ),
-        ),
-      );
-    });
-
-    it.effect("should work with the traditional layer function without headers", () => {
-      const testRecordingsPath = getTestRecordingsPath("traditional-layer");
-      return Effect.gen(function* () {
-        const client = yield* HttpClient.HttpClient;
-        const fs = yield* FileSystem.FileSystem;
-
-        // Clean up any existing test subdirectory  
-        yield* fs.exists(testRecordingsPath).pipe(
-          Effect.flatMap((exists) =>
-            exists 
-              ? fs.remove(testRecordingsPath) 
-              : Effect.succeed(undefined)
-          ),
-          Effect.catchAll(() => Effect.succeed(undefined))
         );
-        
-        // Ensure test subdirectory exists
-        yield* fs.makeDirectory(testRecordingsPath, { recursive: true }).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
-        );
+      },
+    );
 
-        const response = yield* client.get(testUrl);
-        expect(response.status).toBe(200);
+    it.effect(
+      "should work with the traditional layer function without headers",
+      () => {
+        const testRecordingsPath = getTestRecordingsPath("traditional-layer");
+        return Effect.gen(function* () {
+          const client = yield* HttpClient.HttpClient;
+          const fs = yield* FileSystem.FileSystem;
 
-        // Verify recording file was created
-        const files = yield* fs.readDirectory(testRecordingsPath);
-        const recordingFiles = files.filter(f => f.endsWith('.json'));
-        expect(recordingFiles.length).toBe(1);
-      }).pipe(
-        Effect.provide(
-          Layer.provideMerge(
-            HttpRecorder.layer({
-              path: testRecordingsPath,
-              mode: "record",
-            }),
-            NodeLayer,
+          // Clean up any existing test subdirectory
+          yield* fs.exists(testRecordingsPath).pipe(
+            Effect.flatMap((exists) =>
+              exists
+                ? fs.remove(testRecordingsPath)
+                : Effect.succeed(undefined),
+            ),
+            Effect.catchAll(() => Effect.succeed(undefined)),
+          );
+
+          // Ensure test subdirectory exists
+          yield* fs
+            .makeDirectory(testRecordingsPath, { recursive: true })
+            .pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+
+          const response = yield* client.get(testUrl);
+          expect(response.status).toBe(200);
+
+          // Verify recording file was created
+          const files = yield* fs.readDirectory(testRecordingsPath);
+          const recordingFiles = files.filter((f) => f.endsWith(".json"));
+          expect(recordingFiles.length).toBe(1);
+        }).pipe(
+          Effect.provide(
+            Layer.provideMerge(
+              HttpRecorder.layer({
+                path: testRecordingsPath,
+                mode: "record",
+              }),
+              NodeLayer,
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   });
 });
