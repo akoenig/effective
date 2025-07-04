@@ -4,7 +4,7 @@
 		"noEmit": true
 	},
 	"references": [
-		{ "path": "./packages/http-client-recording" },
+		{ "path": "./packages/http-recorder" },
 		{ "path": "./packages/github" },
 		{ "path": "./examples/github-sdk-example" }
 	],

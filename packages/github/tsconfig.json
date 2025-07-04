@@ -7,5 +7,5 @@
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
-	"references": [{ "path": "../http-client-recording" }]
+	"references": [{ "path": "../http-recorder" }]
 }

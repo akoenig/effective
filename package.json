@@ -1,31 +1,30 @@
 {
-	"name": "@akoenig/effect",
-	"version": "1.0.0",
-	"private": true,
-	"description": "Monorepo for Effect-based packages",
-	"type": "module",
-	"scripts": {
-		"build": "pnpm -r build",
-		"test": "pnpm -r test",
-		"typecheck": "pnpm -r typecheck",
-		"lint": "biome lint .",
-		"lint:fix": "biome lint --write .",
-		"format": "biome format .",
-		"format:fix": "biome format --write .",
-		"check": "biome check .",
-		"check:fix": "biome check --write ."
-	},
-	"keywords": [
-		"effect",
-		"typescript",
-		"functional-programming"
-	],
-	"author": "André König <andre.koenig@openformation.io>",
-	"license": "MIT",
-	"packageManager": "pnpm@10.10.0",
-	"devDependencies": {
-		"@biomejs/biome": "2.0.6",
-		"@types/node": "^22.0.0",
-		"typescript": "^5.8.3"
-	}
+  "name": "@akoenig/effective",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for Effect-based packages",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
+  },
+  "keywords": [
+    "effect",
+    "typescript"
+  ],
+  "author": "André König <andre.koenig@openformation.io>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.0.6",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.3"
+  }
 }

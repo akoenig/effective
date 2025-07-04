@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@akoenig/effect-github": "workspace:*",
-		"@akoenig/effect-http-client-recording": "workspace:*",
+		"@akoenig/effect-http-recorder": "workspace:*",
 		"@effect/platform": "^0.87.6",
 		"@effect/platform-node": "^0.88.10",
 		"effect": "^3.16.12"
