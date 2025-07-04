@@ -1,1 +1,1 @@
-export * from "./RecordingHttpClient.js";
+export * from "./HttpRecorder.js";
