@@ -15,10 +15,6 @@ Effect is a powerful TypeScript library designed for building robust, maintainab
 | [@effect/http-recorder](./packages/http-recorder) | HTTP request recording and replay utilities for testing | ✅ Stable |
 | @effect/github | GitHub API SDK built with Effect | 🚧 In Development |
 
-### Examples
-
-- [`github-sdk-example`](./examples/github-sdk-example) - Example usage of the GitHub SDK
-
 ## Development
 
 This monorepo uses [pnpm](https://pnpm.io/) as the package manager. To get started with development:
