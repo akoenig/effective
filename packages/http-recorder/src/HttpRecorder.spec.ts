@@ -1,5 +1,4 @@
-import type { HttpClientRequest } from "@effect/platform";
-import { FileSystem, HttpClient, Path } from "@effect/platform";
+import { FileSystem, HttpClientRequest, Path } from "@effect/platform";
 import { NodeFileSystem, NodeHttpClient, NodePath } from "@effect/platform-node";
 import { it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
@@ -51,7 +50,7 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
 
         // Make a request to the test API
-        const request = HttpClient.request.get(
+        const request = HttpClientRequest.get(
           "https://jsonplaceholder.typicode.com/posts",
         );
 
@@ -61,7 +60,7 @@ describe("HttpRecorder", () => {
         expect(response.status).toBe(200);
         const responseBody = yield* response.json;
         expect(Array.isArray(responseBody)).toBe(true);
-        expect(responseBody.length).toBeGreaterThan(0);
+        expect((responseBody as unknown[]).length).toBeGreaterThan(0);
 
         // Verify that a recording file was created
         const files = yield* fs.readDirectory(testRecordingsPath);
@@ -75,7 +74,7 @@ describe("HttpRecorder", () => {
         const recording = JSON.parse(recordingContent);
 
         expect(recording).toMatchObject({
-          id: expect.stringMatching(/^get__.*__\d+$/),
+          id: expect.stringMatching(/^\d+__GET__.*$/),
           request: {
             method: "GET",
             url: "https://jsonplaceholder.typicode.com/posts",
@@ -116,11 +115,11 @@ describe("HttpRecorder", () => {
           userId: 1,
         };
 
-        const request = HttpClient.request.post(
+        const request = yield* HttpClientRequest.post(
           "https://jsonplaceholder.typicode.com/posts",
         ).pipe(
-          HttpClient.request.setHeader("Content-Type", "application/json"),
-          HttpClient.request.jsonBody(requestBody),
+          HttpClientRequest.setHeader("Content-Type", "application/json"),
+          HttpClientRequest.bodyJson(requestBody),
         );
 
         const response = yield* httpRecorder.execute(request);
@@ -164,12 +163,12 @@ describe("HttpRecorder", () => {
         const fs = yield* FileSystem.FileSystem;
 
         // Make a request with custom headers
-        const request = HttpClient.request.get(
+        const request = HttpClientRequest.get(
           "https://jsonplaceholder.typicode.com/posts",
         ).pipe(
-          HttpClient.request.setHeader("x-custom-header", "should-be-excluded"),
-          HttpClient.request.setHeader("x-secret", "very-secret"),
-          HttpClient.request.setHeader("x-public", "should-be-included"),
+          HttpClientRequest.setHeader("x-custom-header", "should-be-excluded"),
+          HttpClientRequest.setHeader("x-secret", "very-secret"),
+          HttpClientRequest.setHeader("x-public", "should-be-included"),
         );
 
         yield* httpRecorder.execute(request);
@@ -185,6 +184,201 @@ describe("HttpRecorder", () => {
         expect(requestHeaders).not.toHaveProperty("x-custom-header");
         expect(requestHeaders).not.toHaveProperty("x-secret");
         expect(requestHeaders).toHaveProperty("x-public");
+      }).pipe(Effect.provide(TestLayer)),
+    );
+  });
+
+  describe("replay mode", () => {
+    it.effect("should replay recorded requests", () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+
+        // First create a recording file
+        const recordingData = {
+          id: "1234567890__GET__posts",
+          request: {
+            method: "GET",
+            url: "https://jsonplaceholder.typicode.com/posts",
+            headers: { "accept": "application/json" },
+          },
+          response: {
+            status: 200,
+            headers: { "content-type": "application/json" },
+            body: [{ id: 1, title: "Test Post", body: "Test body" }],
+          },
+          timestamp: "2023-01-01T00:00:00.000Z",
+        };
+
+        const recordingPath = path.join(testRecordingsPath, "1234567890__GET__posts.json");
+        yield* fs.writeFileString(recordingPath, JSON.stringify(recordingData, null, 2));
+
+        // Now test replay mode
+        const config = {
+          path: testRecordingsPath,
+          mode: "replay" as const,
+        };
+
+        const httpRecorder = yield* HttpRecorder(config);
+
+        // Make the same request that was recorded
+        const request = HttpClientRequest.get(
+          "https://jsonplaceholder.typicode.com/posts",
+        );
+
+        const response = yield* httpRecorder.execute(request);
+
+        // Verify the response matches the recording
+        expect(response.status).toBe(200);
+        const responseBody = yield* response.json;
+        expect(responseBody).toEqual([{ id: 1, title: "Test Post", body: "Test body" }]);
+      }).pipe(Effect.provide(TestLayer)),
+    );
+
+    it.effect("should fail when no matching recording is found", () =>
+      Effect.gen(function* () {
+        const config = {
+          path: testRecordingsPath,
+          mode: "replay" as const,
+        };
+
+        const httpRecorder = yield* HttpRecorder(config);
+
+        // Make a request that hasn't been recorded
+        const request = HttpClientRequest.get(
+          "https://jsonplaceholder.typicode.com/posts/999",
+        );
+
+        const result = yield* Effect.either(httpRecorder.execute(request));
+
+        expect(result._tag).toBe("Left");
+        if (result._tag === "Left") {
+          expect((result.left as any)._tag).toBe("RequestError");
+          expect((result.left as any).description).toBe("No matching recording found");
+        }
+      }).pipe(Effect.provide(TestLayer)),
+    );
+
+    it.effect("should replay POST requests with body matching", () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+
+        // Create a POST recording
+        const recordingData = {
+          id: "1234567890__POST__posts",
+          request: {
+            method: "POST",
+            url: "https://jsonplaceholder.typicode.com/posts",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ title: "Test", body: "Test body" }),
+          },
+          response: {
+            status: 201,
+            headers: { "content-type": "application/json" },
+            body: { id: 101, title: "Test", body: "Test body" },
+          },
+          timestamp: "2023-01-01T00:00:00.000Z",
+        };
+
+        const recordingPath = path.join(testRecordingsPath, "1234567890__POST__posts.json");
+        yield* fs.writeFileString(recordingPath, JSON.stringify(recordingData, null, 2));
+
+        // Test replay mode
+        const config = {
+          path: testRecordingsPath,
+          mode: "replay" as const,
+        };
+
+        const httpRecorder = yield* HttpRecorder(config);
+
+        // Make the same POST request
+        const request = yield* HttpClientRequest.post(
+          "https://jsonplaceholder.typicode.com/posts",
+        ).pipe(
+          HttpClientRequest.setHeader("Content-Type", "application/json"),
+          HttpClientRequest.bodyJson({ title: "Test", body: "Test body" }),
+        );
+
+        const response = yield* httpRecorder.execute(request);
+
+        // Verify the response matches the recording
+        expect(response.status).toBe(201);
+        const responseBody = yield* response.json;
+        expect(responseBody).toEqual({ id: 101, title: "Test", body: "Test body" });
+      }).pipe(Effect.provide(TestLayer)),
+    );
+  });
+
+  describe("error handling", () => {
+    it.effect("should handle directory creation errors", () =>
+      Effect.gen(function* () {
+        const config = {
+          path: "/invalid/path/that/cannot/be/created",
+          mode: "record" as const,
+        };
+
+        const httpRecorder = yield* HttpRecorder(config);
+
+        const request = HttpClientRequest.get(
+          "https://jsonplaceholder.typicode.com/posts",
+        );
+
+        // This should still work because we catch recording errors
+        const response = yield* httpRecorder.execute(request);
+        expect(response.status).toBe(200);
+      }).pipe(Effect.provide(TestLayer)),
+    );
+
+    it.effect("should handle directory read errors in replay mode", () =>
+      Effect.gen(function* () {
+        const config = {
+          path: "/nonexistent/path",
+          mode: "replay" as const,
+        };
+
+        const httpRecorder = yield* HttpRecorder(config);
+
+        const request = HttpClientRequest.get(
+          "https://jsonplaceholder.typicode.com/posts",
+        );
+
+        const result = yield* Effect.either(httpRecorder.execute(request));
+
+        expect(result._tag).toBe("Left");
+        if (result._tag === "Left") {
+          expect((result.left as any)._tag).toBe("RequestError");
+          expect((result.left as any).description).toContain("Recording error");
+        }
+      }).pipe(Effect.provide(TestLayer)),
+    );
+
+    it.effect("should handle invalid JSON in recording files", () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+
+        // Create an invalid JSON file
+        const invalidJsonPath = path.join(testRecordingsPath, "invalid.json");
+        yield* fs.writeFileString(invalidJsonPath, "{ invalid json }");
+
+        const config = {
+          path: testRecordingsPath,
+          mode: "replay" as const,
+        };
+
+        const httpRecorder = yield* HttpRecorder(config);
+
+        const request = HttpClientRequest.get(
+          "https://jsonplaceholder.typicode.com/posts",
+        );
+
+        const result = yield* Effect.either(httpRecorder.execute(request));
+
+        expect(result._tag).toBe("Left");
+        if (result._tag === "Left") {
+          expect((result.left as any)._tag).toBe("RequestError");
+        }
       }).pipe(Effect.provide(TestLayer)),
     );
   });

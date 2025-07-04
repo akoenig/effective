@@ -1,9 +1,9 @@
 # Recording Http Client
 
-- Make sure that the client utilizes the `@effect/platform` completely (filesystem, etc.)
-- Filename of the recording should look better.
-- Test (with a static API)
 - Redaction functionality
+- JS Docs
+- Polishing (readme, jsdocs, no excessive comments)
+
 
 # GitHub
 
