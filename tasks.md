@@ -2,7 +2,6 @@
 
 - Add a generic type to the redaction function (`unknown` = default)
 
-- JS Docs
 - Polishing (readme, jsdocs, no excessive comments, just add necessary exports)
 - License
 
