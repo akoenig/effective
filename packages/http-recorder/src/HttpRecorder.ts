@@ -9,12 +9,38 @@ import {
 import { Effect, Schema } from "effect";
 
 /**
+ * Context provided to redaction functions
+ */
+export interface RedactionContext {
+  readonly method: string;
+  readonly url: string;
+  readonly headers: Record<string, string>;
+  readonly body?: unknown;
+  readonly type: "request" | "response";
+  readonly status?: number;
+}
+
+/**
+ * Result returned by redaction functions
+ */
+export interface RedactionResult {
+  readonly headers?: Record<string, string>;
+  readonly body?: unknown;
+}
+
+/**
+ * Function type for custom redaction logic
+ */
+export type RedactionFunction = (context: RedactionContext) => RedactionResult;
+
+/**
  * Configuration for the HttpRecorder
  */
 export interface HttpRecorderConfig {
   readonly path: string;
   readonly mode: "record" | "replay";
   readonly excludedHeaders?: ReadonlyArray<string>;
+  readonly redactionFn?: RedactionFunction;
 }
 
 /**
@@ -93,10 +119,11 @@ export class HttpRecorderError extends Schema.TaggedError<HttpRecorderError>()(
 /**
  * Creates an HTTP client with recording and replay capabilities
  * 
- * @param config - Configuration object specifying the recording path, mode, and optional excluded headers
+ * @param config - Configuration object specifying the recording path, mode, optional excluded headers, and optional redaction function
  * @returns An Effect that yields an HttpClient with recording/replay functionality
  * 
  * @example
+ * Basic usage:
  * ```typescript
  * const recorder = yield* HttpRecorder({
  *   path: "./recordings",
@@ -107,6 +134,21 @@ export class HttpRecorderError extends Schema.TaggedError<HttpRecorderError>()(
  * const response = yield* recorder.execute(
  *   HttpClientRequest.get("https://api.example.com/data")
  * );
+ * ```
+ * 
+ * @example
+ * With redaction:
+ * ```typescript
+ * import { createHeaderRedactor, createJsonRedactor, compose } from "@akoenig/effect-http-recorder";
+ * 
+ * const recorder = yield* HttpRecorder({
+ *   path: "./recordings",
+ *   mode: "record",
+ *   redactionFn: compose(
+ *     createHeaderRedactor(["x-api-key", "authorization"]),
+ *     createJsonRedactor(["user.email", "user.phone"])
+ *   )
+ * });
  * ```
  */
 export function HttpRecorder(config: HttpRecorderConfig): Effect.Effect<
@@ -136,6 +178,63 @@ export function HttpRecorder(config: HttpRecorderConfig): Effect.Effect<
       }
 
       return filtered;
+    }
+
+    function applyRedaction(
+      request: HttpClientRequest.HttpClientRequest,
+      response: HttpClientResponse.HttpClientResponse,
+      requestBody: unknown,
+      responseBody: unknown,
+    ): {
+      redactedRequest: { headers: Record<string, string>; body: unknown };
+      redactedResponse: { headers: Record<string, string>; body: unknown };
+    } {
+      if (!config.redactionFn) {
+        return {
+          redactedRequest: {
+            headers: filterHeaders(request.headers),
+            body: requestBody,
+          },
+          redactedResponse: {
+            headers: filterHeaders(response.headers),
+            body: responseBody,
+          },
+        };
+      }
+
+      // Apply redaction first, before filtering sensitive headers
+      const requestContext: RedactionContext = {
+        method: request.method,
+        url: request.url,
+        headers: request.headers,
+        body: requestBody,
+        type: "request",
+      };
+
+      const responseContext: RedactionContext = {
+        method: request.method,
+        url: request.url,
+        headers: response.headers,
+        body: responseBody,
+        type: "response",
+        status: response.status,
+      };
+
+      const redactedRequestResult = config.redactionFn(requestContext);
+      const redactedResponseResult = config.redactionFn(responseContext);
+
+      // When redaction is provided, trust the redaction function to handle security
+      // and bypass default header filtering
+      return {
+        redactedRequest: {
+          headers: redactedRequestResult.headers ?? requestContext.headers,
+          body: redactedRequestResult.body ?? requestContext.body,
+        },
+        redactedResponse: {
+          headers: redactedResponseResult.headers ?? responseContext.headers,
+          body: redactedResponseResult.body ?? responseContext.body,
+        },
+      };
     }
 
     function createSlug(input: string): string {
@@ -193,18 +292,59 @@ export function HttpRecorder(config: HttpRecorderConfig): Effect.Effect<
             ? new TextDecoder().decode(request.body.body)
             : undefined;
 
+        // Parse JSON bodies for redaction if possible
+        const parsedRequestBody = (() => {
+          if (typeof requestBody === "string") {
+            try {
+              return JSON.parse(requestBody);
+            } catch {
+              return requestBody;
+            }
+          }
+          return requestBody;
+        })();
+
+        const parsedResponseBody = (() => {
+          if (typeof responseBody === "string") {
+            try {
+              return JSON.parse(responseBody);
+            } catch {
+              return responseBody;
+            }
+          }
+          return responseBody;
+        })();
+
+        const { redactedRequest, redactedResponse } = applyRedaction(
+          request,
+          response,
+          parsedRequestBody,
+          parsedResponseBody,
+        );
+
+        // Serialize redacted bodies back to appropriate format
+        const finalRequestBody = (() => {
+          if (redactedRequest.body !== undefined && redactedRequest.body !== requestBody) {
+            // Body was redacted, serialize it
+            return typeof requestBody === "string" 
+              ? JSON.stringify(redactedRequest.body)
+              : redactedRequest.body;
+          }
+          return requestBody;
+        })();
+
         const transaction: RecordedTransaction = {
           id: transactionId,
           request: {
             method: request.method,
             url: request.url,
-            headers: filterHeaders(request.headers),
-            body: requestBody,
+            headers: redactedRequest.headers,
+            body: finalRequestBody,
           },
           response: {
             status: response.status,
-            headers: filterHeaders(response.headers),
-            body: responseBody,
+            headers: redactedResponse.headers,
+            body: redactedResponse.body,
           },
           timestamp: new Date().toISOString(),
         };
@@ -270,6 +410,8 @@ export function HttpRecorder(config: HttpRecorderConfig): Effect.Effect<
       transaction: RecordedTransaction,
       request: HttpClientRequest.HttpClientRequest,
     ): HttpClientResponse.HttpClientResponse {
+      // Note: In replay mode, we use the recorded data as-is
+      // The data has already been redacted when it was recorded
       const webResponse = new Response(
         typeof transaction.response.body === "string"
           ? transaction.response.body
