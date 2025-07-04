@@ -1,29 +1,31 @@
 {
-	"name": "@akoenig/effect-github",
+	"name": "@akoenig/effect",
 	"version": "1.0.0",
-	"description": "GitHub SDK for Effect",
+	"private": true,
+	"description": "Monorepo for Effect-based packages",
 	"type": "module",
 	"scripts": {
+		"build": "pnpm -r build",
+		"test": "pnpm -r test",
+		"typecheck": "pnpm -r typecheck",
 		"lint": "biome lint .",
 		"lint:fix": "biome lint --write .",
 		"format": "biome format .",
 		"format:fix": "biome format --write .",
 		"check": "biome check .",
-		"check:fix": "biome check --write .",
-		"typecheck": "tsc --noEmit"
+		"check:fix": "biome check --write ."
 	},
-	"keywords": [],
+	"keywords": [
+		"effect",
+		"typescript",
+		"functional-programming"
+	],
 	"author": "André König <andre.koenig@openformation.io>",
 	"license": "MIT",
 	"packageManager": "pnpm@10.10.0",
 	"devDependencies": {
 		"@biomejs/biome": "2.0.6",
-		"@effect/platform-node": "^0.88.10",
 		"@types/node": "^22.0.0",
 		"typescript": "^5.8.3"
-	},
-	"peerDependencies": {
-		"@effect/platform": "^0.87.6",
-		"effect": "^3.16.12"
 	}
 }

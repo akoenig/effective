@@ -1,0 +1,37 @@
+{
+  "name": "@akoenig/effect-github",
+  "version": "1.0.0",
+  "description": "GitHub SDK for Effect",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist .tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "effect",
+    "github",
+    "sdk",
+    "api"
+  ],
+  "author": "André König <andre.koenig@openformation.io>",
+  "license": "MIT",
+  "peerDependencies": {
+    "@effect/platform": "^0.87.6",
+    "effect": "^3.16.12"
+  },
+  "devDependencies": {
+    "@akoenig/effect-http-client-recording": "workspace:*",
+    "@effect/platform-node": "^0.88.10"
+  }
+}

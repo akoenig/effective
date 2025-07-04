@@ -1,0 +1,12 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"rootDir": "./src"
+	},
+	"include": ["src/**/*"],
+	"references": [
+		{ "path": "../../packages/github" },
+		{ "path": "../../packages/http-client-recording" }
+	]
+}

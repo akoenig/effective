@@ -184,10 +184,7 @@ const makeRecordingHttpClient = Effect.gen(function* () {
 
 			try {
 				yield* Effect.promise(() =>
-					fs.promises.writeFile(
-						filePath,
-						JSON.stringify(transaction, null, 2),
-					),
+					fs.promises.writeFile(filePath, JSON.stringify(transaction, null, 2)),
 				);
 			} catch (error) {
 				return yield* Effect.fail(
@@ -201,10 +198,7 @@ const makeRecordingHttpClient = Effect.gen(function* () {
 
 	const findMatchingRecording = (
 		request: HttpClientRequest.HttpClientRequest,
-	): Effect.Effect<
-		RecordedTransaction | null,
-		RecordingHttpClientError
-	> => {
+	): Effect.Effect<RecordedTransaction | null, RecordingHttpClientError> => {
 		return Effect.gen(function* () {
 			try {
 				const files = yield* Effect.promise(() =>
@@ -297,9 +291,7 @@ const makeRecordingHttpClient = Effect.gen(function* () {
 
 			yield* recordTransaction(request, response, responseBody).pipe(
 				Effect.catchAll((error) =>
-					Effect.logWarning(
-						`Failed to record transaction: ${error.message}`,
-					),
+					Effect.logWarning(`Failed to record transaction: ${error.message}`),
 				),
 			);
 
@@ -308,7 +300,7 @@ const makeRecordingHttpClient = Effect.gen(function* () {
 	};
 
 	return HttpClient.make(execute);
-})
+});
 
 /**
  * Creates a layer that provides an HttpClient with recording/replay capabilities
@@ -317,8 +309,11 @@ export const createRecordingHttpClientLayer = (
 	config: RecordingHttpClientConfig,
 ): Layer.Layer<HttpClient.HttpClient, never, HttpClient.HttpClient> => {
 	const configLayer = Layer.succeed(RecordingHttpClientConfigService, config);
-	const httpClientLayer = Layer.effect(HttpClient.HttpClient, makeRecordingHttpClient);
-	
+	const httpClientLayer = Layer.effect(
+		HttpClient.HttpClient,
+		makeRecordingHttpClient,
+	);
+
 	return Layer.provide(httpClientLayer, configLayer);
 };
 

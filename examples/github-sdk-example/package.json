@@ -1,0 +1,21 @@
+{
+	"name": "github-sdk-example",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Example usage of @akoenig/effect-github",
+	"type": "module",
+	"scripts": {
+		"start": "tsx src/index.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@akoenig/effect-github": "workspace:*",
+		"@akoenig/effect-http-client-recording": "workspace:*",
+		"@effect/platform": "^0.87.6",
+		"@effect/platform-node": "^0.88.10",
+		"effect": "^3.16.12"
+	},
+	"devDependencies": {
+		"tsx": "^4.19.2"
+	}
+}
