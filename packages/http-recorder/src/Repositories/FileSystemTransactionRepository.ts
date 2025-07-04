@@ -48,10 +48,7 @@ export class FileSystemTransactionRepository extends Effect.Service<FileSystemTr
          * Save a recorded transaction to the file system
          * @since 1.0.0
          */
-        save(
-          transaction: RecordedTransaction,
-          filePath: string,
-        ) {
+        save(transaction: RecordedTransaction, filePath: string) {
           return Effect.gen(function* () {
             const serializedTransaction =
               yield* transactionSerializer.serialize(transaction);
@@ -136,9 +133,7 @@ export class FileSystemTransactionRepository extends Effect.Service<FileSystemTr
          * Ensure storage directory exists
          * @since 1.0.0
          */
-        ensureStorageExists(
-          storagePath: string,
-        ) {
+        ensureStorageExists(storagePath: string) {
           return Effect.gen(function* () {
             yield* fs.makeDirectory(storagePath, { recursive: true }).pipe(
               Effect.mapError(

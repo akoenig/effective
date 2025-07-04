@@ -33,7 +33,7 @@ export class RedactionService extends Effect.Service<RedactionService>()(
           excludedHeaders: Set<string>,
         ) {
           const { redactionFn } = config;
-          
+
           const shouldSkipRedaction = Predicate.isUndefined(redactionFn);
 
           if (shouldSkipRedaction) {
@@ -81,7 +81,8 @@ export class RedactionService extends Effect.Service<RedactionService>()(
               body: redactedRequestResult.body ?? requestContext.body,
             },
             redactedResponse: {
-              headers: redactedResponseResult.headers ?? responseContext.headers,
+              headers:
+                redactedResponseResult.headers ?? responseContext.headers,
               body: redactedResponseResult.body ?? responseContext.body,
             },
           });

@@ -42,9 +42,7 @@ export class TransactionIdGenerator extends Effect.Service<TransactionIdGenerato
        * Generate a unique transaction ID for the current moment
        * @since 1.0.0
        */
-      generateNow(
-        request: HttpClientRequest.HttpClientRequest,
-      ) {
+      generateNow(request: HttpClientRequest.HttpClientRequest) {
         const now = DateTime.unsafeNow();
         return this.generate(request, now);
       },
