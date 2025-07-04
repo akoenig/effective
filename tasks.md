@@ -1,4 +1,11 @@
-GitHub
+# Recording Http Client
+
+- Make sure that the client utilizes the `@effect/platform` completely (filesystem, etc.)
+- Filename of the recording should look better.
+- Test (with a static API)
+- Redaction functionality
+
+# GitHub
 
 - Tests? How?
 - Semantic errors instead of type attributes (see `domain/errors.ts`)

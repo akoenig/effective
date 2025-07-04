@@ -40,3 +40,6 @@ tests/fixtures/recordings/*.json
 # Temporary files
 .tmp/
 temp/
+
+# Recording files
+recordings/
