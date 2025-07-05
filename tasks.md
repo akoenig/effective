@@ -1,9 +1,6 @@
 # Recording Http Client
 
-- Add a generic type to the redaction function (`unknown` = default)
-
-- Polishing (readme, jsdocs, no excessive comments, just add necessary exports)
-- License
+- Renovate
 
 # GitHub
 

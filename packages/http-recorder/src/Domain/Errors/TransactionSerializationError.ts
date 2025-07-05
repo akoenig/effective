@@ -1,14 +1,14 @@
 /**
  * @since 1.0.0
  */
-import { Schema } from "effect";
+import { Schema } from 'effect'
 
 /**
  * @since 1.0.0
  * @category errors
  */
 export class TransactionSerializationError extends Schema.TaggedError<TransactionSerializationError>()(
-  "TransactionSerializationError",
+  'TransactionSerializationError',
   {
     message: Schema.String,
     operation: Schema.String,
