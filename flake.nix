@@ -15,7 +15,7 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             nodejs_22 # Node.js 22 is the current LTS
-            nodePackages.pnpm # pnpm package manager
+            pnpm # pnpm package manager
             git
           ];
 
@@ -23,9 +23,6 @@
             echo "Development environment loaded!"
             echo "Node.js version: $(node --version)"
             echo "pnpm version: $(pnpm --version)"
-            
-            # Enable corepack for consistency
-            corepack enable
           '';
         };
       });
