@@ -1,11 +1,11 @@
 /**
  * @since 1.0.0
  */
-import type { HttpClientRequest, HttpClientResponse } from "@effect/platform";
-import { Effect, Predicate } from "effect";
-import type { HttpRecorderConfig } from "../Domain/ValueObjects/HttpRecorderConfig.js";
-import { RedactionContext } from "../Domain/ValueObjects/RedactionContext.js";
-import { HeaderService } from "./HeaderService.js";
+import type { HttpClientRequest, HttpClientResponse } from '@effect/platform'
+import { Effect, Predicate } from 'effect'
+import type { HttpRecorderConfig } from '../Domain/ValueObjects/HttpRecorderConfig.js'
+import { RedactionContext } from '../Domain/ValueObjects/RedactionContext.js'
+import { HeaderService } from './HeaderService.js'
 
 /**
  * @since 1.0.0
@@ -13,11 +13,11 @@ import { HeaderService } from "./HeaderService.js";
  * @summary Service for applying data redaction to HTTP requests and responses
  */
 export class RedactionService extends Effect.Service<RedactionService>()(
-  "@akoenig/effect-http-recorder/RedactionService",
+  '@akoenig/effect-http-recorder/RedactionService',
   {
     dependencies: [HeaderService.Default],
     effect: Effect.gen(function* () {
-      const headerService = yield* HeaderService;
+      const headerService = yield* HeaderService
 
       return {
         /**
@@ -32,9 +32,9 @@ export class RedactionService extends Effect.Service<RedactionService>()(
           config: HttpRecorderConfig,
           excludedHeaders: Set<string>,
         ) {
-          const { redactionFn } = config;
+          const { redaction } = config
 
-          const shouldSkipRedaction = Predicate.isUndefined(redactionFn);
+          const shouldSkipRedaction = Predicate.isUndefined(redaction)
 
           if (shouldSkipRedaction) {
             return Effect.succeed({
@@ -52,7 +52,7 @@ export class RedactionService extends Effect.Service<RedactionService>()(
                 ),
                 body: responseBody,
               },
-            });
+            })
           }
 
           const requestContext = RedactionContext.make({
@@ -60,32 +60,35 @@ export class RedactionService extends Effect.Service<RedactionService>()(
             url: request.url,
             headers: request.headers,
             body: requestBody,
-            type: "request",
-          });
+            type: 'request',
+          })
 
           const responseContext = RedactionContext.make({
             method: request.method,
             url: request.url,
             headers: response.headers,
             body: responseBody,
-            type: "response",
+            type: 'response',
             status: response.status,
-          });
+          })
 
-          const redactedRequestResult = redactionFn(requestContext);
-          const redactedResponseResult = redactionFn(responseContext);
+          return Effect.gen(function* () {
+            const redactedRequestResult = yield* redaction(requestContext)
+            const redactedResponseResult = yield* redaction(responseContext)
 
-          return Effect.succeed({
-            redactedRequest: {
-              headers: redactedRequestResult.headers ?? requestContext.headers,
-              body: redactedRequestResult.body ?? requestContext.body,
-            },
-            redactedResponse: {
-              headers:
-                redactedResponseResult.headers ?? responseContext.headers,
-              body: redactedResponseResult.body ?? responseContext.body,
-            },
-          });
+            return {
+              redactedRequest: {
+                headers:
+                  redactedRequestResult.headers ?? requestContext.headers,
+                body: redactedRequestResult.body ?? requestContext.body,
+              },
+              redactedResponse: {
+                headers:
+                  redactedResponseResult.headers ?? responseContext.headers,
+                body: redactedResponseResult.body ?? responseContext.body,
+              },
+            }
+          })
         },
 
         /**
@@ -93,9 +96,9 @@ export class RedactionService extends Effect.Service<RedactionService>()(
          * @since 1.0.0
          */
         shouldApplyRedaction(config: HttpRecorderConfig) {
-          return Predicate.isNotUndefined(config.redactionFn);
+          return Predicate.isNotUndefined(config.redaction)
         },
-      };
+      }
     }),
   },
 ) {}

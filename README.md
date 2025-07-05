@@ -30,7 +30,34 @@ pnpm build
 pnpm test
 ```
 
+### Versioning and Releases
+
+This monorepo uses [Changesets](https://github.com/changesets/changesets) for version management and publishing:
+
+```bash
+# Add a changeset when making changes
+pnpm changeset
+
+# Check what will be released
+pnpm changeset:status
+
+# Bump versions and update changelogs
+pnpm changeset:version
+
+# Publish packages
+pnpm changeset:publish
+```
+
 Each package in this monorepo is independently versioned and can be published separately. See the individual package READMEs for specific development instructions.
+
+### CI/CD
+
+This repository uses GitHub Actions for continuous integration and automated releases:
+
+- **CI Workflow**: Runs tests, linting, type checking, and builds on every PR and push to main
+- **Release Workflow**: Automatically creates release PRs and publishes packages when changesets are merged
+
+See [`.github/SETUP.md`](./.github/SETUP.md) for repository configuration requirements.
 
 ## Contributing
 

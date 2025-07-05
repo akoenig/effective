@@ -1,11 +1,11 @@
 /**
  * @since 1.0.0
  */
-import type { HttpClientRequest } from "@effect/platform";
-import { HttpClientResponse } from "@effect/platform";
-import { Effect } from "effect";
-import type { RecordedTransaction } from "../../Domain/Entities/RecordedTransaction.js";
-import { TransactionSerializer } from "../Serialization/TransactionSerializer.js";
+import type { HttpClientRequest } from '@effect/platform'
+import { HttpClientResponse } from '@effect/platform'
+import { Effect } from 'effect'
+import type { RecordedTransaction } from '../../Domain/Entities/RecordedTransaction.js'
+import { TransactionSerializer } from '../Serialization/TransactionSerializer.js'
 
 /**
  * @since 1.0.0
@@ -13,11 +13,11 @@ import { TransactionSerializer } from "../Serialization/TransactionSerializer.js
  * @summary Adapts between HTTP responses and domain objects
  */
 export class HttpClientAdapter extends Effect.Service<HttpClientAdapter>()(
-  "@akoenig/effect-http-recorder/HttpClientAdapter",
+  '@akoenig/effect-http-recorder/HttpClientAdapter',
   {
     dependencies: [TransactionSerializer.Default],
     effect: Effect.gen(function* () {
-      const transactionSerializer = yield* TransactionSerializer;
+      const transactionSerializer = yield* TransactionSerializer
 
       return {
         /**
@@ -30,21 +30,21 @@ export class HttpClientAdapter extends Effect.Service<HttpClientAdapter>()(
         ) {
           return Effect.gen(function* () {
             const isResponseBodyString =
-              typeof transaction.response.body === "string";
+              typeof transaction.response.body === 'string'
 
             const bodyString = isResponseBodyString
               ? transaction.response.body
               : yield* transactionSerializer.serializeBody(
                   transaction.response.body,
-                );
+                )
 
             const webResponse = new Response(bodyString, {
               status: transaction.response.status,
               headers: transaction.response.headers,
-            });
+            })
 
-            return HttpClientResponse.fromWeb(request, webResponse);
-          });
+            return HttpClientResponse.fromWeb(request, webResponse)
+          })
         },
 
         /**
@@ -55,9 +55,9 @@ export class HttpClientAdapter extends Effect.Service<HttpClientAdapter>()(
           return response.json.pipe(
             Effect.catchAll(() => response.text),
             Effect.catchAll(() => Effect.succeed(null)),
-          );
+          )
         },
-      };
+      }
     }),
   },
 ) {}

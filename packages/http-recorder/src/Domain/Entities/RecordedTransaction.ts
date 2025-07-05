@@ -1,25 +1,25 @@
 /**
  * @fileoverview Recorded Transaction Entity
- * 
+ *
  * This module defines the RecordedTransaction entity that represents a complete
  * HTTP request/response interaction that has been recorded and can be replayed.
- * 
+ *
  * @since 1.0.0
  */
-import { Schema } from "effect";
-import { TransactionId } from "../ValueObjects/TransactionId.js";
+import { Schema } from 'effect'
+import { TransactionId } from '../ValueObjects/TransactionId.js'
 
 /**
  * Entity representing a complete HTTP transaction (request + response) that has been recorded
- * 
+ *
  * This class encapsulates both the HTTP request and response data along with metadata
  * like transaction ID and timestamp. It's used to persist HTTP interactions to disk
  * and later replay them during testing or development.
- * 
+ *
  * The transaction ID is automatically generated based on the request characteristics
  * to ensure consistent replay behavior. The timestamp records when the interaction
  * was originally captured.
- * 
+ *
  * @since 1.0.0
  * @category entities
  * @example
@@ -30,7 +30,7 @@ import { TransactionId } from "../ValueObjects/TransactionId.js";
  *   request: {
  *     method: "GET",
  *     url: "https://api.example.com/users",
- *     headers: { 
+ *     headers: {
  *       "content-type": "application/json",
  *       "user-agent": "MyApp/1.0.0"
  *     },
@@ -38,7 +38,7 @@ import { TransactionId } from "../ValueObjects/TransactionId.js";
  *   },
  *   response: {
  *     status: 200,
- *     headers: { 
+ *     headers: {
  *       "content-type": "application/json",
  *       "cache-control": "no-cache"
  *     },
@@ -49,14 +49,14 @@ import { TransactionId } from "../ValueObjects/TransactionId.js";
  *   },
  *   timestamp: "2023-12-07T10:30:00.000Z"
  * });
- * 
+ *
  * // Create a recorded transaction for a POST request with request body
  * const postTransaction = RecordedTransaction.make({
  *   id: "1234567891__POST_users",
  *   request: {
  *     method: "POST",
  *     url: "https://api.example.com/users",
- *     headers: { 
+ *     headers: {
  *       "content-type": "application/json",
  *       "authorization": "Bearer token123"
  *     },
@@ -64,7 +64,7 @@ import { TransactionId } from "../ValueObjects/TransactionId.js";
  *   },
  *   response: {
  *     status: 201,
- *     headers: { 
+ *     headers: {
  *       "content-type": "application/json",
  *       "location": "/users/3"
  *     },
@@ -75,9 +75,9 @@ import { TransactionId } from "../ValueObjects/TransactionId.js";
  * ```
  */
 export class RecordedTransaction extends Schema.Class<RecordedTransaction>(
-  "RecordedTransaction",
+  'RecordedTransaction',
 )({
-  /** 
+  /**
    * Unique identifier for this transaction, typically generated from request characteristics
    * Format: timestamp__METHOD_pathSegment (e.g., "1234567890__GET_users")
    */

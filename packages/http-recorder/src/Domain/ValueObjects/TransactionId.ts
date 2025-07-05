@@ -1,7 +1,7 @@
 /**
  * @since 1.0.0
  */
-import { Schema } from "effect";
+import { Schema } from 'effect'
 
 /**
  * @since 1.0.0
@@ -10,8 +10,8 @@ import { Schema } from "effect";
  */
 export const TransactionId = Schema.String.pipe(
   Schema.pattern(/^\d+__[A-Z]+_[a-z0-9-]*$/),
-  Schema.brand("TransactionId"),
-);
+  Schema.brand('TransactionId'),
+)
 
 /**
  * @since 1.0.0
@@ -20,8 +20,8 @@ export const TransactionId = Schema.String.pipe(
  */
 export const Slug = Schema.String.pipe(
   Schema.pattern(/^[a-z0-9-]*$/),
-  Schema.brand("Slug"),
-);
+  Schema.brand('Slug'),
+)
 
 /**
  * @since 1.0.0
@@ -33,12 +33,12 @@ export const StringToSlug = Schema.transform(Schema.String, Slug, {
     input
       .toLowerCase()
       .trim()
-      .replace(/\//g, "-")
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-")
-      .replace(/^-+|-+$/g, ""),
+      .replace(/\//g, '-')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, ''),
   encode: (slug) => slug,
-});
+})
 
 /**
  * @since 1.0.0
@@ -59,13 +59,13 @@ export const CreateTransactionId = Schema.transform(
         typeof TransactionId
       >,
     encode: (id) => {
-      const [timestamp, rest = ""] = id.split("__");
-      const [method = "", slug = ""] = rest.split("_", 2);
+      const [timestamp, rest = ''] = id.split('__')
+      const [method = '', slug = ''] = rest.split('_', 2)
       return {
         timestamp: Number(timestamp),
         method,
         slug: slug as Schema.Schema.Type<typeof Slug>,
-      };
+      }
     },
   },
-);
+)

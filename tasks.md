@@ -1,8 +1,6 @@
 # Recording Http Client
 
-- Remove old redaction helpers (pipeline, compose, etc.)
-- Replayer should have also a config object
-- Changeset workflow: https://claude.ai/share/aec30f70-211d-4acd-965e-475f3caa9734
+- Renovate
 
 # GitHub
 
