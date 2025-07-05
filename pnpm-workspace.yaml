@@ -1,6 +1,3 @@
 packages:
   - 'packages/*'
   - 'examples/*'
-
-settings:
-  inject-workspace-packages: true
