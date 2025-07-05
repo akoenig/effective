@@ -15,23 +15,17 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             nodejs_22 # Node.js 22 is the current LTS
-            corepack_22 # Corepack for Node.js 22
+            nodePackages.pnpm # pnpm package manager
             git
           ];
 
           shellHook = ''
             echo "Development environment loaded!"
             echo "Node.js version: $(node --version)"
-            
-            # Enable pnpm through corepack
-            export COREPACK_ENABLE_STRICT=0
-            corepack enable
-            corepack prepare pnpm@latest --activate
-            
-            # Ensure pnpm is in PATH
-            export PATH="$HOME/.local/share/pnpm:$PATH"
-            
             echo "pnpm version: $(pnpm --version)"
+            
+            # Enable corepack for consistency
+            corepack enable
           '';
         };
       });
