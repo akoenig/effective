@@ -21,6 +21,11 @@
           shellHook = ''
             echo "Development environment loaded!"
             echo "Node.js version: $(node --version)"
+            
+            # Enable corepack for pnpm
+            corepack enable
+            corepack prepare pnpm@latest --activate
+            echo "pnpm version: $(pnpm --version)"
           '';
         };
       });
