@@ -9,8 +9,8 @@ import { afterAll, describe, expect, it } from '@effect/vitest'
 import { Config, Effect, Layer } from 'effect'
 import {
   HttpRecorder,
-  RedactionResult,
   type RedactionContext,
+  RedactionResult,
 } from './HttpRecorder.js'
 
 const NodeLayer = Layer.mergeAll(
