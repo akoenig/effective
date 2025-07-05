@@ -25,7 +25,7 @@
   ],
   "author": "André König <andre.koenig@openformation.io>",
   "license": "MIT",
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "pnpm@10.12.4",
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
     "@changesets/cli": "^2.29.5",

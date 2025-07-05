@@ -19,34 +19,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.10.0
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: pnpm
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: nix develop --command pnpm install --frozen-lockfile
 
       - name: Type check
-        run: pnpm typecheck
+        run: nix develop --command pnpm typecheck
 
       - name: Lint
-        run: pnpm lint
+        run: nix develop --command pnpm lint
 
       - name: Format check
-        run: pnpm check
+        run: nix develop --command pnpm check
 
       - name: Build
-        run: pnpm build
+        run: nix develop --command pnpm build
 
       - name: Test
-        run: pnpm test
+        run: nix develop --command pnpm test
 
   changeset-check:
     name: Changeset Check
@@ -59,19 +54,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.10.0
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: pnpm
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: nix develop --command pnpm install --frozen-lockfile
 
       - name: Check for changesets
-        run: pnpm changeset:status
+        run: nix develop --command pnpm changeset:status
