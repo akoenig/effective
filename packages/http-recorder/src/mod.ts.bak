@@ -24,7 +24,9 @@
  * });
  * 
  * // Create a replayer for replay mode
- * const replayer = HttpReplayer.layer("./recordings");
+ * const replayer = HttpReplayer.layer(
+ *   path: "./recordings"
+ * });
  * 
  * // Use with your HTTP client
  * const program = Effect.gen(function* () {

@@ -14,23 +14,21 @@ import type { RedactionFunction } from "../Types/RedactionFunction.js";
  * Configuration schema for the HTTP recorder
  * 
  * This class defines all the configuration options available for the HTTP recorder,
- * including where to store recordings, what mode to operate in, which headers to exclude,
- * and how to redact sensitive data.
+ * including where to store recordings, which headers to exclude, and how to redact
+ * sensitive data.
  * 
  * @since 1.0.0
  * @category models
  * @example
  * ```typescript
- * // Basic configuration for recording
+ * // Basic configuration
  * const config = HttpRecorderConfig.make({
- *   path: "./recordings",
- *   mode: "record"
+ *   path: "./recordings"
  * });
  * 
  * // Advanced configuration with redaction
  * const advancedConfig = HttpRecorderConfig.make({
  *   path: "./test-recordings",
- *   mode: "replay",
  *   excludedHeaders: ["x-custom-token", "x-internal-id"],
  *   // Optional: provide a redaction function to sanitize sensitive data
  *   redactionFn: (context) => ({
@@ -42,7 +40,6 @@ import type { RedactionFunction } from "../Types/RedactionFunction.js";
  * // Configuration with dynamic headers
  * const configWithHeaders = HttpRecorderConfig.make({
  *   path: "./recordings",
- *   mode: "record",
  *   headers: {
  *     "Authorization": Config.string("API_TOKEN"),
  *     "X-Client-Version": Config.succeed("1.0.0")
@@ -58,12 +55,6 @@ export class HttpRecorderConfig extends Schema.Class<HttpRecorderConfig>(
    * The directory will be created if it doesn't exist.
    */
   path: Schema.String,
-  /** 
-   * Recording mode:
-   * - "record": Execute real HTTP requests and save responses to disk
-   * - "replay": Use saved responses instead of making real HTTP requests
-   */
-  mode: Schema.Literal("record", "replay"),
   /** 
    * Optional array of header names to exclude from recordings.
    * These headers will be filtered out before saving to disk.

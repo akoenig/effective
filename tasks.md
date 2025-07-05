@@ -1,9 +1,8 @@
 # Recording Http Client
 
-- Add a generic type to the redaction function (`unknown` = default)
-
-- Polishing (readme, jsdocs, no excessive comments, just add necessary exports)
-- License
+- Remove old redaction helpers (pipeline, compose, etc.)
+- Replayer should have also a config object
+- Changeset workflow: https://claude.ai/share/aec30f70-211d-4acd-965e-475f3caa9734
 
 # GitHub
 

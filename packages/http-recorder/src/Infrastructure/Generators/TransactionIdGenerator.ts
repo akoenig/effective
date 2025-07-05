@@ -6,7 +6,6 @@ import { DateTime, Effect, Schema } from "effect";
 import {
   CreateTransactionId,
   StringToSlug,
-  type TransactionId,
 } from "../../Domain/ValueObjects/TransactionId.js";
 
 /**

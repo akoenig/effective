@@ -15,6 +15,7 @@
   },
   "linter": {
     "enabled": true,
+    "includes": ["packages/**/src/**/*.ts"],
     "rules": {
       "recommended": true
     }

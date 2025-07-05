@@ -1,4 +1,4 @@
-# Effect Packages Monorepo
+# Effective
 
 This repository contains several packages built for the [Effect](https://effect.website/) ecosystem.
 
