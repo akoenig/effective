@@ -1,3 +1,8 @@
 packages:
   - 'packages/*'
   - 'examples/*'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+  injectWorkspacePackages: true
