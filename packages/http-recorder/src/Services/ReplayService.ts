@@ -1,11 +1,11 @@
 /**
  * @since 1.0.0
  */
-import type { HttpClientRequest } from "@effect/platform";
-import { Effect } from "effect";
-import type { HttpRecorderConfig } from "../Domain/ValueObjects/HttpRecorderConfig.js";
-import { HttpClientAdapter } from "../Infrastructure/Http/HttpClientAdapter.js";
-import { FileSystemTransactionRepository } from "../Repositories/FileSystemTransactionRepository.js";
+import type { HttpClientRequest } from '@effect/platform'
+import { Effect } from 'effect'
+import type { HttpRecorderConfig } from '../Domain/ValueObjects/HttpRecorderConfig.js'
+import { HttpClientAdapter } from '../Infrastructure/Http/HttpClientAdapter.js'
+import { FileSystemTransactionRepository } from '../Repositories/FileSystemTransactionRepository.js'
 
 /**
  * @since 1.0.0
@@ -13,15 +13,15 @@ import { FileSystemTransactionRepository } from "../Repositories/FileSystemTrans
  * @summary Service for replaying recorded HTTP transactions
  */
 export class ReplayService extends Effect.Service<ReplayService>()(
-  "@akoenig/effect-http-recorder/ReplayService",
+  '@akoenig/effect-http-recorder/ReplayService',
   {
     dependencies: [
       FileSystemTransactionRepository.Default,
       HttpClientAdapter.Default,
     ],
     effect: Effect.gen(function* () {
-      const repository = yield* FileSystemTransactionRepository;
-      const httpClientAdapter = yield* HttpClientAdapter;
+      const repository = yield* FileSystemTransactionRepository
+      const httpClientAdapter = yield* HttpClientAdapter
 
       return {
         /**
@@ -36,20 +36,20 @@ export class ReplayService extends Effect.Service<ReplayService>()(
             const recording = yield* repository
               .findByMethodAndUrl(request, config.path)
               .pipe(
-                Effect.catchTag("TransactionNotFoundError", () =>
+                Effect.catchTag('TransactionNotFoundError', () =>
                   Effect.succeed(null),
                 ),
-              );
+              )
 
             if (recording === null) {
-              return null;
+              return null
             }
 
             return yield* httpClientAdapter.createResponseFromRecording(
               recording,
               request,
-            );
-          });
+            )
+          })
         },
 
         /**
@@ -65,15 +65,15 @@ export class ReplayService extends Effect.Service<ReplayService>()(
               .findByMethodAndUrl(request, config.path)
               .pipe(
                 Effect.map(() => true),
-                Effect.catchTag("TransactionNotFoundError", () =>
+                Effect.catchTag('TransactionNotFoundError', () =>
                   Effect.succeed(false),
                 ),
-              );
+              )
 
-            return hasRecording;
-          });
+            return hasRecording
+          })
         },
-      };
+      }
     }),
   },
 ) {}

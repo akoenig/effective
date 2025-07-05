@@ -1,10 +1,10 @@
 /**
  * @since 1.0.0
  */
-import { Effect, Schema } from "effect";
-import { RecordedTransaction } from "../../Domain/Entities/RecordedTransaction.js";
-import { BodySerializationError } from "../../Domain/Errors/BodySerializationError.js";
-import { TransactionSerializationError } from "../../Domain/Errors/TransactionSerializationError.js";
+import { Effect, Schema } from 'effect'
+import { RecordedTransaction } from '../../Domain/Entities/RecordedTransaction.js'
+import { BodySerializationError } from '../../Domain/Errors/BodySerializationError.js'
+import { TransactionSerializationError } from '../../Domain/Errors/TransactionSerializationError.js'
 
 /**
  * @since 1.0.0
@@ -12,7 +12,7 @@ import { TransactionSerializationError } from "../../Domain/Errors/TransactionSe
  * @summary Handles serialization and deserialization of RecordedTransaction objects
  */
 export class TransactionSerializer extends Effect.Service<TransactionSerializer>()(
-  "@akoenig/effect-http-recorder/TransactionSerializer",
+  '@akoenig/effect-http-recorder/TransactionSerializer',
   {
     succeed: {
       /**
@@ -27,11 +27,11 @@ export class TransactionSerializer extends Effect.Service<TransactionSerializer>
             (error) =>
               new TransactionSerializationError({
                 message: `Failed to serialize transaction: ${String(error)}`,
-                operation: "serialize",
+                operation: 'serialize',
                 cause: String(error),
               }),
           ),
-        );
+        )
       },
 
       /**
@@ -41,7 +41,7 @@ export class TransactionSerializer extends Effect.Service<TransactionSerializer>
       deserialize(content: string) {
         return Schema.decodeUnknown(Schema.parseJson(RecordedTransaction))(
           content,
-        ).pipe(Effect.catchAll(() => Effect.succeed(null)));
+        ).pipe(Effect.catchAll(() => Effect.succeed(null)))
       },
 
       /**
@@ -49,11 +49,11 @@ export class TransactionSerializer extends Effect.Service<TransactionSerializer>
        * @since 1.0.0
        */
       parseJsonBody(body: unknown) {
-        return typeof body === "string"
+        return typeof body === 'string'
           ? Schema.decodeUnknown(Schema.parseJson(Schema.Unknown))(body).pipe(
               Effect.catchAll(() => Effect.succeed(body)),
             )
-          : Effect.succeed(body);
+          : Effect.succeed(body)
       },
 
       /**
@@ -70,7 +70,7 @@ export class TransactionSerializer extends Effect.Service<TransactionSerializer>
                 cause: String(error),
               }),
           ),
-        );
+        )
       },
     },
   },

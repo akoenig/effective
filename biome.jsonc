@@ -15,13 +15,15 @@
   },
   "linter": {
     "enabled": true,
+    "includes": ["packages/**/src/**/*.ts"],
     "rules": {
       "recommended": true
     }
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "single",
+      "semicolons": "asNeeded"
     }
   },
   "assist": {

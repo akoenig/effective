@@ -1,22 +1,22 @@
 /**
  * @since 1.0.0
  */
-import type { HttpClientRequest } from "@effect/platform";
-import { FileSystem, Path } from "@effect/platform";
-import { Effect } from "effect";
-import type { RecordedTransaction } from "../Domain/Entities/RecordedTransaction.js";
-import { DirectoryCreationError } from "../Domain/Errors/DirectoryCreationError.js";
-import { FileSystemReadError } from "../Domain/Errors/FileSystemReadError.js";
-import { FileSystemWriteError } from "../Domain/Errors/FileSystemWriteError.js";
-import { TransactionNotFoundError } from "../Domain/Errors/TransactionNotFoundError.js";
-import { TransactionSerializer } from "../Infrastructure/Serialization/TransactionSerializer.js";
+import type { HttpClientRequest } from '@effect/platform'
+import { FileSystem, Path } from '@effect/platform'
+import { Effect } from 'effect'
+import type { RecordedTransaction } from '../Domain/Entities/RecordedTransaction.js'
+import { DirectoryCreationError } from '../Domain/Errors/DirectoryCreationError.js'
+import { FileSystemReadError } from '../Domain/Errors/FileSystemReadError.js'
+import { FileSystemWriteError } from '../Domain/Errors/FileSystemWriteError.js'
+import { TransactionNotFoundError } from '../Domain/Errors/TransactionNotFoundError.js'
+import { TransactionSerializer } from '../Infrastructure/Serialization/TransactionSerializer.js'
 
 /**
  * @since 1.0.0
  * @category predicates
  * @internal
  */
-const isJsonFile = (filename: string): boolean => filename.endsWith(".json");
+const isJsonFile = (filename: string): boolean => filename.endsWith('.json')
 
 /**
  * @since 1.0.0
@@ -27,7 +27,7 @@ const isMatchingTransaction =
   (request: HttpClientRequest.HttpClientRequest) =>
   (transaction: RecordedTransaction): boolean =>
     transaction.request.method === request.method &&
-    transaction.request.url === request.url;
+    transaction.request.url === request.url
 
 /**
  * @since 1.0.0
@@ -35,13 +35,13 @@ const isMatchingTransaction =
  * @summary File system implementation of TransactionRepository
  */
 export class FileSystemTransactionRepository extends Effect.Service<FileSystemTransactionRepository>()(
-  "@akoenig/effect-http-recorder/FileSystemTransactionRepository",
+  '@akoenig/effect-http-recorder/FileSystemTransactionRepository',
   {
     dependencies: [TransactionSerializer.Default],
     effect: Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const transactionSerializer = yield* TransactionSerializer;
+      const fs = yield* FileSystem.FileSystem
+      const path = yield* Path.Path
+      const transactionSerializer = yield* TransactionSerializer
 
       return {
         /**
@@ -51,7 +51,7 @@ export class FileSystemTransactionRepository extends Effect.Service<FileSystemTr
         save(transaction: RecordedTransaction, filePath: string) {
           return Effect.gen(function* () {
             const serializedTransaction =
-              yield* transactionSerializer.serialize(transaction);
+              yield* transactionSerializer.serialize(transaction)
 
             yield* fs.writeFileString(filePath, serializedTransaction).pipe(
               Effect.mapError(
@@ -59,12 +59,12 @@ export class FileSystemTransactionRepository extends Effect.Service<FileSystemTr
                   new FileSystemWriteError({
                     message: `Failed to write recording: ${String(error)}`,
                     filePath,
-                    operation: "writeFileString",
+                    operation: 'writeFileString',
                     cause: String(error),
                   }),
               ),
-            );
-          });
+            )
+          })
         },
 
         /**
@@ -82,40 +82,40 @@ export class FileSystemTransactionRepository extends Effect.Service<FileSystemTr
                   new FileSystemReadError({
                     message: `Failed to read directory: ${String(error)}`,
                     path: storagePath,
-                    operation: "readDirectory",
+                    operation: 'readDirectory',
                     cause: String(error),
                   }),
               ),
-            );
+            )
 
-            const jsonFiles = files.filter(isJsonFile);
+            const jsonFiles = files.filter(isJsonFile)
 
             for (const file of jsonFiles) {
-              const filePath = path.join(storagePath, file);
+              const filePath = path.join(storagePath, file)
               const content = yield* fs.readFileString(filePath).pipe(
                 Effect.mapError(
                   (error) =>
                     new FileSystemReadError({
                       message: `Failed to read file: ${String(error)}`,
                       path: filePath,
-                      operation: "readFileString",
+                      operation: 'readFileString',
                       cause: String(error),
                     }),
                 ),
-              );
+              )
 
               const parseResult =
-                yield* transactionSerializer.deserialize(content);
+                yield* transactionSerializer.deserialize(content)
 
               if (parseResult === null) {
-                continue;
+                continue
               }
 
-              const transaction = parseResult;
-              const isMatching = isMatchingTransaction(request)(transaction);
+              const transaction = parseResult
+              const isMatching = isMatchingTransaction(request)(transaction)
 
               if (isMatching) {
-                return transaction;
+                return transaction
               }
             }
 
@@ -125,8 +125,8 @@ export class FileSystemTransactionRepository extends Effect.Service<FileSystemTr
                 method: request.method,
                 url: request.url,
               }),
-            );
-          });
+            )
+          })
         },
 
         /**
@@ -144,10 +144,10 @@ export class FileSystemTransactionRepository extends Effect.Service<FileSystemTr
                     cause: String(error),
                   }),
               ),
-            );
-          });
+            )
+          })
         },
-      };
+      }
     }),
   },
 ) {}
