@@ -28,6 +28,11 @@
   ],
   "author": "André König <andre.koenig@openformation.io>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akoenig/effective.git",
+    "directory": "packages/http-recorder"
+  },
   "peerDependencies": {
     "@effect/platform": "^0.87.6",
     "effect": "^3.16.12"
