@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Schema } from 'effect'
 
 /**
  * GitHub SDK specific error types using Schema.TaggedError
@@ -8,11 +8,11 @@ import { Schema } from "effect";
  * Authentication related errors
  */
 export class GitHubAuthError extends Schema.TaggedError<GitHubAuthError>()(
-  "GitHubAuthError",
+  'GitHubAuthError',
   {
     message: Schema.String,
     type: Schema.optional(
-      Schema.Literal("invalid_config", "missing_token", "app_not_implemented"),
+      Schema.Literal('invalid_config', 'missing_token', 'app_not_implemented'),
     ),
   },
 ) {}
@@ -21,7 +21,7 @@ export class GitHubAuthError extends Schema.TaggedError<GitHubAuthError>()(
  * HTTP client related errors
  */
 export class GitHubHttpError extends Schema.TaggedError<GitHubHttpError>()(
-  "GitHubHttpError",
+  'GitHubHttpError',
   {
     message: Schema.String,
     status: Schema.optional(Schema.Number),
@@ -33,7 +33,7 @@ export class GitHubHttpError extends Schema.TaggedError<GitHubHttpError>()(
  * API request related errors
  */
 export class GitHubApiError extends Schema.TaggedError<GitHubApiError>()(
-  "GitHubApiError",
+  'GitHubApiError',
   {
     message: Schema.String,
     status: Schema.Number,
@@ -46,12 +46,12 @@ export class GitHubApiError extends Schema.TaggedError<GitHubApiError>()(
  * Repository specific errors
  */
 export class GitHubRepositoryError extends Schema.TaggedError<GitHubRepositoryError>()(
-  "GitHubRepositoryError",
+  'GitHubRepositoryError',
   {
     message: Schema.String,
     repository: Schema.optional(Schema.String),
     operation: Schema.optional(
-      Schema.Literal("list", "get", "create", "update", "delete"),
+      Schema.Literal('list', 'get', 'create', 'update', 'delete'),
     ),
   },
 ) {}
@@ -60,12 +60,12 @@ export class GitHubRepositoryError extends Schema.TaggedError<GitHubRepositoryEr
  * Notification specific errors
  */
 export class GitHubNotificationError extends Schema.TaggedError<GitHubNotificationError>()(
-  "GitHubNotificationError",
+  'GitHubNotificationError',
   {
     message: Schema.String,
     notificationId: Schema.optional(Schema.String),
     operation: Schema.optional(
-      Schema.Literal("list", "mark_read", "mark_all_read", "get_thread"),
+      Schema.Literal('list', 'mark_read', 'mark_all_read', 'get_thread'),
     ),
   },
 ) {}
@@ -74,7 +74,7 @@ export class GitHubNotificationError extends Schema.TaggedError<GitHubNotificati
  * Configuration related errors
  */
 export class GitHubConfigError extends Schema.TaggedError<GitHubConfigError>()(
-  "GitHubConfigError",
+  'GitHubConfigError',
   {
     message: Schema.String,
     field: Schema.optional(Schema.String),
@@ -90,4 +90,4 @@ export type GitHubSDKError =
   | GitHubApiError
   | GitHubRepositoryError
   | GitHubNotificationError
-  | GitHubConfigError;
+  | GitHubConfigError

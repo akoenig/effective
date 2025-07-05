@@ -1,13 +1,13 @@
-import { Config, Layer, type Redacted } from "effect";
+import { Config, Layer, type Redacted } from 'effect'
 // Infrastructure
 import {
   GitHubAuthConfigService,
   GitHubAuthService,
   GitHubHttpClientConfigService,
   GitHubHttpClientService,
-} from "./infrastructure/index.js";
+} from './infrastructure/index.js'
 // Services
-import { NotificationsService, RepositoriesService } from "./services/index.js";
+import { NotificationsService, RepositoriesService } from './services/index.js'
 
 /**
  * Complete GitHub SDK layer that provides all services except auth
@@ -18,7 +18,7 @@ export const GitHubSDKWithoutAuth = Layer.mergeAll(
   GitHubHttpClientService.Default,
   RepositoriesService.Default,
   NotificationsService.Default,
-);
+)
 
 /**
  * Complete GitHub SDK layer that provides all services
@@ -29,7 +29,7 @@ export const GitHubSDK = Layer.mergeAll(
   GitHubAuthService.Default,
   RepositoriesService.Default,
   NotificationsService.Default,
-);
+)
 
 /**
  * GitHub SDK layer factory with custom configuration
@@ -43,7 +43,7 @@ export const createGitHubSDK = () =>
     GitHubAuthService.Default,
     RepositoriesService.Default,
     NotificationsService.Default,
-  );
+  )
 
 /**
  * GitHub SDK namespace with convenient layer creation functions
@@ -66,30 +66,30 @@ export const GitHub = {
     const TokenLayer = Layer.effect(
       GitHubAuthConfigService,
       Config.map(config.token, (token) => ({
-        type: "token" as const,
+        type: 'token' as const,
         token: token,
       })),
-    );
+    )
 
     // 1. Configuration layer - provides all config services
     const ConfigLayer = Layer.mergeAll(
       GitHubHttpClientConfigService.Default,
       TokenLayer,
-    );
+    )
 
     // 2. Core services layer - provides auth and http client with their dependencies
     const CoreServicesLayer = Layer.mergeAll(
       Layer.provide(GitHubAuthService.Default, ConfigLayer),
       Layer.provide(GitHubHttpClientService.Default, ConfigLayer),
-    );
+    )
 
     // 3. API services layer - provides GitHub API services with their dependencies
     const APIServicesLayer = Layer.mergeAll(
       Layer.provide(RepositoriesService.Default, CoreServicesLayer),
       Layer.provide(NotificationsService.Default, CoreServicesLayer),
-    );
+    )
 
     // 4. Final layer that provides everything
-    return Layer.mergeAll(ConfigLayer, CoreServicesLayer, APIServicesLayer);
+    return Layer.mergeAll(ConfigLayer, CoreServicesLayer, APIServicesLayer)
   },
-};
+}
