@@ -5,8 +5,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/mod.js",
+      "types": "./dist/mod.d.ts"
     }
   },
   "files": [
@@ -16,7 +16,8 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "rm -rf dist .tsbuildinfo",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest"
   },
   "keywords": [
     "effect",
@@ -32,6 +33,8 @@
     "effect": "^3.16.12"
   },
   "devDependencies": {
-    "@effect/platform-node": "^0.88.10"
+    "@effect/platform-node": "^0.88.11",
+    "@effect/vitest": "^0.23.12",
+    "vitest": "^3.2.4"
   }
 }

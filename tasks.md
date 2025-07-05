@@ -1,9 +1,6 @@
 # Recording Http Client
 
-- Make sure that the client utilizes the `@effect/platform` completely (filesystem, etc.)
-- Filename of the recording should look better.
-- Test (with a static API)
-- Redaction functionality
+- Renovate
 
 # GitHub
 
@@ -13,9 +10,44 @@
 - Refresh JSDocs
 - Refactor exports (only export what is really required)
 - GitHub actions npm publishing flow
+- `findMatchingRecording` should use Effect Schema
 - Refresh README
 
 
 - JSDoc for attributes in the response types (possible?)
 - Integrate all the other GitHub endpoints
 - Integrate Linear Notifications
+
+
+```ts
+const program = Effect.gen(function* () {
+  const http = yield* HttpClient.HttpClient;
+
+  yield* http.get("https://api.github.com/user")
+
+}).pipe(Effect.provide(
+  Layer.provideMerge(
+    HttpRecorder.Default({
+      path: "./recordings",
+      mode: "record", // Change to "replay" to use recorded responses
+      excludedHeaders: ["x-github-request-id"],
+    }),
+    NodeHttpClient.layer,
+  )
+))
+```
+
+Bad:
+
+```ts
+  const shouldSkipRedaction = Predicate.isUndefined(config.redactionFn);
+  if (shouldSkipRedaction) {
+```
+
+Good:
+
+```ts
+  const shouldSkipRedaction = Predicate.isUndefined(config.redactionFn);
+
+  if (shouldSkipRedaction) {
+```

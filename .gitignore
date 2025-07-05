@@ -43,3 +43,9 @@ temp/
 
 # Recording files
 recordings/
+test-recordings/
+
+# Nix/direnv
+.direnv/
+
+/ai

@@ -1,303 +1,238 @@
-import type { HttpClientRequest } from "@effect/platform";
-import {
-  FileSystem,
-  HttpClient,
-  HttpClientError,
-  HttpClientResponse,
-  Path,
-} from "@effect/platform";
-import { Effect, Schema } from "effect";
-
 /**
- * Configuration for the HttpRecorder
+ * @fileoverview HTTP Recorder - Core recording and replay functionality
+ *
+ * This module provides the main HttpRecorder implementation for recording and replaying
+ * HTTP requests and responses in Effect applications.
+ *
+ * @since 1.0.0
  */
-export interface HttpRecorderConfig {
-  readonly path: string;
-  readonly mode: "record" | "replay";
-  readonly excludedHeaders?: ReadonlyArray<string>;
-}
+import type { HttpClientRequest } from '@effect/platform'
+import { HttpClient } from '@effect/platform'
+import { type Config, Effect, Layer } from 'effect'
+
+export { BodySerializationError } from './Domain/Errors/BodySerializationError.js'
+export { DirectoryCreationError } from './Domain/Errors/DirectoryCreationError.js'
+export { FileSystemReadError } from './Domain/Errors/FileSystemReadError.js'
+export { FileSystemWriteError } from './Domain/Errors/FileSystemWriteError.js'
+export { TransactionNotFoundError } from './Domain/Errors/TransactionNotFoundError.js'
+export { TransactionSerializationError } from './Domain/Errors/TransactionSerializationError.js'
+export type { RedactionEffect } from './Domain/Types/RedactionEffect.js'
+export { HttpRecorderConfig } from './Domain/ValueObjects/HttpRecorderConfig.js'
+export { RedactionContext } from './Domain/ValueObjects/RedactionContext.js'
+export { RedactionResult } from './Domain/ValueObjects/RedactionResult.js'
+
+import type { RedactionEffect } from './Domain/Types/RedactionEffect.js'
+import { HttpRecorderConfig } from './Domain/ValueObjects/HttpRecorderConfig.js'
+import { HttpClientAdapter } from './Infrastructure/Http/HttpClientAdapter.js'
+import { HeaderService } from './Services/HeaderService.js'
+import { RecordingService } from './Services/RecordingService.js'
+import { RedactionService } from './Services/RedactionService.js'
 
 /**
- * Schema for HttpRecorder configuration
- */
-export const HttpRecorderConfigSchema = Schema.Struct({
-  path: Schema.String,
-  mode: Schema.Literal("record", "replay"),
-  excludedHeaders: Schema.optional(Schema.Array(Schema.String)),
-});
-
-/**
- * Default excluded headers for security
+ * Default headers that are excluded from recordings for security purposes
+ * @since 1.0.0
+ * @category constants
+ * @internal
  */
 const DEFAULT_EXCLUDED_HEADERS = [
-  "authorization",
-  "cookie",
-  "set-cookie",
-  "x-api-key",
-  "x-auth-token",
-  "access-token",
-  "refresh-token",
-  "bearer",
-  "x-csrf-token",
-  "x-xsrf-token",
-] as const;
+  'authorization',
+  'cookie',
+  'set-cookie',
+  'x-api-key',
+  'x-auth-token',
+  'access-token',
+  'refresh-token',
+  'bearer',
+  'x-csrf-token',
+  'x-xsrf-token',
+] as const
 
 /**
- * Structure of a recorded HTTP transaction
+ * Creates the HttpRecorder layer that records HTTP requests
+ * @since 1.0.0
+ * @category layers
+ * @internal
+ * @param config - Configuration for the HTTP recorder
+ * @returns Effect layer that provides HTTP recording functionality
  */
-export interface RecordedTransaction {
-  readonly id: string;
-  readonly request: {
-    readonly method: string;
-    readonly url: string;
-    readonly headers: Record<string, string>;
-    readonly body?: unknown;
-  };
-  readonly response: {
-    readonly status: number;
-    readonly headers: Record<string, string>;
-    readonly body: unknown;
-  };
-  readonly timestamp: string;
-}
+const recorderLayer = (config: HttpRecorderConfig) =>
+  Layer.effect(
+    HttpClient.HttpClient,
+    Effect.gen(function* () {
+      const baseHttpClient = yield* HttpClient.HttpClient
+      const headerService = yield* HeaderService
+      const recordingService = yield* RecordingService
+      const httpClientAdapter = yield* HttpClientAdapter
 
-/**
- * Schema for recorded transaction
- */
-export const RecordedTransactionSchema = Schema.Struct({
-  id: Schema.String,
-  request: Schema.Struct({
-    method: Schema.String,
-    url: Schema.String,
-    headers: Schema.Record({ key: Schema.String, value: Schema.String }),
-    body: Schema.optional(Schema.Unknown),
-  }),
-  response: Schema.Struct({
-    status: Schema.Number,
-    headers: Schema.Record({ key: Schema.String, value: Schema.String }),
-    body: Schema.Unknown,
-  }),
-  timestamp: Schema.String,
-});
+      // Create excluded headers set
+      const excludedHeaders = headerService.createExcludedHeadersSet(
+        DEFAULT_EXCLUDED_HEADERS,
+        config.excludedHeaders,
+      )
 
-/**
- * Tagged error for recording issues
- */
-export class HttpRecorderError extends Schema.TaggedError<HttpRecorderError>()(
-  "HttpRecorderError",
-  {
-    message: Schema.String,
-  },
-) {}
+      return HttpClient.transform(baseHttpClient, (_effect, request) =>
+        Effect.gen(function* () {
+          // Resolve headers for each request
+          const resolvedHeaders = yield* headerService.resolveHeaders(
+            config.headers,
+          )
 
-/**
- * Recording HttpClient service with parameter support
- */
-export class HttpRecorder extends Effect.Service<HttpRecorder>()(
-  "HttpRecorder",
-  {
-    effect: Effect.fn(function* (config: HttpRecorderConfig) {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const httpClient = yield* HttpClient.HttpClient;
-
-      const excludedHeaders = new Set([
-        ...DEFAULT_EXCLUDED_HEADERS,
-        ...(config.excludedHeaders ?? []).map((h: string) => h.toLowerCase()),
-      ]);
-
-      const filterHeaders = (
-        headers: Record<string, string>,
-      ): Record<string, string> => {
-        const filtered: Record<string, string> = {};
-        for (const [key, value] of Object.entries(headers)) {
-          if (!excludedHeaders.has(key.toLowerCase())) {
-            filtered[key] = value;
+          // Merge resolved headers with request headers
+          const enhancedRequest: HttpClientRequest.HttpClientRequest = {
+            ...request,
+            headers: {
+              ...resolvedHeaders,
+              ...request.headers,
+            },
           }
-        }
-        return filtered;
-      };
 
-      const generateTransactionId = (
-        request: HttpClientRequest.HttpClientRequest,
-      ): string => {
-        const method = request.method;
-        const url = request.url;
-        const timestamp = Date.now();
-        return `${method}_${encodeURIComponent(url)}_${timestamp}`;
-      };
+          // Execute the request and record the transaction
+          const response = yield* baseHttpClient.execute(enhancedRequest)
+          const responseBody =
+            yield* httpClientAdapter.extractResponseBody(response)
 
-      const getRecordingFilePath = (transactionId: string): string => {
-        return path.join(config.path, `${transactionId}.json`);
-      };
-
-      const ensureDirectoryExists = (
-        dirPath: string,
-      ): Effect.Effect<void, HttpRecorderError> => {
-        return Effect.gen(function* () {
-          yield* fs.makeDirectory(dirPath, { recursive: true }).pipe(
-            Effect.mapError(
-              (error) =>
-                new HttpRecorderError({
-                  message: `Failed to create directory: ${String(error)}`,
-                }),
-            ),
-          );
-        });
-      };
-
-      const recordTransaction = (
-        request: HttpClientRequest.HttpClientRequest,
-        response: HttpClientResponse.HttpClientResponse,
-        responseBody: unknown,
-      ): Effect.Effect<void, HttpRecorderError> => {
-        return Effect.gen(function* () {
-          const transactionId = generateTransactionId(request);
-          const filePath = getRecordingFilePath(transactionId);
-
-          yield* ensureDirectoryExists(config.path);
-
-          const requestBody =
-            request.body?._tag === "Raw" ? request.body.body : undefined;
-
-          const transaction: RecordedTransaction = {
-            id: transactionId,
-            request: {
-              method: request.method,
-              url: request.url,
-              headers: filterHeaders(request.headers),
-              body: requestBody,
-            },
-            response: {
-              status: response.status,
-              headers: filterHeaders(response.headers),
-              body: responseBody,
-            },
-            timestamp: new Date().toISOString(),
-          };
-
-          yield* fs
-            .writeFileString(filePath, JSON.stringify(transaction, null, 2))
+          yield* recordingService
+            .recordTransaction(
+              enhancedRequest,
+              response,
+              responseBody,
+              config,
+              excludedHeaders,
+            )
             .pipe(
-              Effect.mapError(
-                (error) =>
-                  new HttpRecorderError({
-                    message: `Failed to write recording: ${String(error)}`,
-                  }),
+              Effect.catchAll((error) =>
+                Effect.logWarning(
+                  `Failed to record transaction: ${error.message}`,
+                ),
               ),
-            );
-        });
-      };
+            )
 
-      const findMatchingRecording = (
-        request: HttpClientRequest.HttpClientRequest,
-      ): Effect.Effect<
-        RecordedTransaction | null,
-        HttpRecorderError
-      > => {
-        return Effect.gen(function* () {
-          const files = yield* fs.readDirectory(config.path).pipe(
-            Effect.mapError(
-              (error) =>
-                new HttpRecorderError({
-                  message: `Failed to read directory: ${String(error)}`,
-                }),
-            ),
-          );
-          const jsonFiles = files.filter((file) => file.endsWith(".json"));
-
-          for (const file of jsonFiles) {
-            const filePath = path.join(config.path, file);
-            const content = yield* fs.readFileString(filePath).pipe(
-              Effect.mapError(
-                (error) =>
-                  new HttpRecorderError({
-                    message: `Failed to read file: ${String(error)}`,
-                  }),
-              ),
-            );
-            const transaction = JSON.parse(content) as RecordedTransaction;
-
-            if (
-              transaction.request.method === request.method &&
-              transaction.request.url === request.url
-            ) {
-              return transaction;
-            }
-          }
-
-          return null;
-        });
-      };
-
-      const createResponseFromRecording = (
-        transaction: RecordedTransaction,
-        request: HttpClientRequest.HttpClientRequest,
-      ): HttpClientResponse.HttpClientResponse => {
-        const webResponse = new Response(
-          typeof transaction.response.body === "string"
-            ? transaction.response.body
-            : JSON.stringify(transaction.response.body),
-          {
-            status: transaction.response.status,
-            headers: transaction.response.headers,
-          },
-        );
-
-        return HttpClientResponse.fromWeb(request, webResponse);
-      };
-
-      const execute = (
-        request: HttpClientRequest.HttpClientRequest,
-      ): Effect.Effect<
-        HttpClientResponse.HttpClientResponse,
-        HttpClientError.HttpClientError
-      > => {
-        return Effect.gen(function* () {
-          if (config.mode === "replay") {
-            const recording = yield* findMatchingRecording(request).pipe(
-              Effect.mapError(
-                (error) =>
-                  new HttpClientError.RequestError({
-                    request,
-                    reason: "Transport",
-                    description: `Recording error: ${error.message}`,
-                  }),
-              ),
-            );
-
-            if (recording) {
-              return createResponseFromRecording(recording, request);
-            }
-
-            return yield* Effect.fail(
-              new HttpClientError.RequestError({
-                request,
-                reason: "Transport",
-                description: "No matching recording found",
-              }),
-            );
-          }
-
-          const response = yield* httpClient.execute(request);
-          const responseBody = yield* response.json.pipe(
-            Effect.catchAll(() => response.text),
-            Effect.catchAll(() => Effect.succeed(null)),
-          );
-
-          yield* recordTransaction(request, response, responseBody).pipe(
-            Effect.catchAll((error) =>
-              Effect.logWarning(
-                `Failed to record transaction: ${error.message}`,
-              ),
-            ),
-          );
-
-          return response;
-        });
-      };
-
-      return HttpClient.make(execute);
+          return response
+        }).pipe(Effect.withSpan('HttpRecorder.transform')),
+      )
     }),
-  },
-) {}
+  ).pipe(
+    Layer.provide(
+      Layer.mergeAll(
+        HttpClientAdapter.Default,
+        RecordingService.Default,
+        RedactionService.Default,
+        HeaderService.Default,
+      ),
+    ),
+  )
+
+/**
+ * Creates an HTTP recorder layer with dynamic header support
+ * @since 1.0.0
+ * @category layers
+ * @param options - Configuration options for the recorder
+ * @param options.path - Directory path where recordings will be stored
+ * @param options.excludedHeaders - Optional array of header names to exclude from recordings
+ * @param options.redaction - Optional effect to redact sensitive data from requests/responses
+ * @param options.headers - Record of header names to Config values for dynamic header resolution
+ * @returns Effect layer that provides HTTP recording functionality
+ * @example
+ * ```typescript
+ * import { Config } from "effect";
+ *
+ * const recorder = HttpRecorder.layerWithHeaders({
+ *   path: "./recordings",
+ *   excludedHeaders: ["x-sensitive-header"],
+ *   headers: {
+ *     "X-API-Key": Config.string("API_KEY"),
+ *     "User-Agent": Config.succeed("MyApp/1.0")
+ *   }
+ * });
+ * ```
+ */
+export const recorderLayerWithHeaders = (options: {
+  path: string
+  excludedHeaders?: Array<string>
+  redaction?: RedactionEffect
+  headers: Record<string, Config.Config<string>>
+}) => recorderLayer(HttpRecorderConfig.make(options))
+
+/**
+ * HttpRecorder namespace containing the API for HTTP request/response recording
+ *
+ * This namespace provides layers for creating HTTP recorders that can intercept and record
+ * HTTP interactions in Effect applications. It supports various configuration options including
+ * custom redaction functions, header exclusion, and dynamic header resolution.
+ *
+ * @since 1.0.0
+ * @category namespace
+ * @example
+ * ```typescript
+ * import { HttpRecorder } from "@akoenig/effect-http-recorder";
+ * import { HttpClient } from "@effect/platform";
+ * import { NodeHttpClient } from "@effect/platform-node";
+ * import { Effect, Layer } from "effect";
+ *
+ * // Basic usage
+ * const recorder = HttpRecorder.layer({
+ *   path: "./recordings"
+ * });
+ *
+ * // With custom redaction
+ * const recorderWithRedaction = HttpRecorder.layer({
+ *   path: "./recordings",
+ *   redaction: (context) => Effect.succeed(RedactionResult.make({
+ *     headers: context.headers,
+ *     body: context.type === "request" ? "***REDACTED***" : context.body
+ *   }))
+ * });
+ *
+ * // Use in your application
+ * const program = Effect.gen(function* () {
+ *   const http = yield* HttpClient.HttpClient;
+ *   return yield* http.get("https://api.example.com/data");
+ * }).pipe(
+ *   Effect.provide(Layer.provideMerge(recorder, NodeHttpClient.layer))
+ * );
+ * ```
+ */
+export const HttpRecorder = {
+  /**
+   * Creates an HTTP recorder layer with static configuration
+   * @since 1.0.0
+   * @category layers
+   * @param config - Configuration options for the recorder
+   * @param config.path - Directory path where recordings will be stored
+   * @param config.excludedHeaders - Optional array of header names to exclude from recordings
+   * @param config.redaction - Optional effect to redact sensitive data from requests/responses
+   * @returns Effect layer that provides HTTP recording functionality
+   * @example
+   * ```typescript
+   * const recorder = HttpRecorder.layer({
+   *   path: "./recordings",
+   *   excludedHeaders: ["authorization", "x-api-key"],
+   *   redaction: (context) => Effect.succeed(RedactionResult.make({
+   *     headers: context.headers,
+   *     body: context.body
+   *   }))
+   * });
+   * ```
+   */
+  layer: recorderLayer,
+  /**
+   * Creates an HTTP recorder layer with dynamic header support
+   * @since 1.0.0
+   * @category layers
+   * @param options - Configuration options including dynamic headers
+   * @returns Effect layer that provides HTTP recording functionality
+   * @example
+   * ```typescript
+   * import { Config } from "effect";
+   *
+   * const recorder = HttpRecorder.layerWithHeaders({
+   *   path: "./recordings",
+   *   headers: {
+   *     "Authorization": Config.string("AUTH_TOKEN"),
+   *     "X-Client-Version": Config.succeed("1.0.0")
+   *   }
+   * });
+   * ```
+   */
+  layerWithHeaders: recorderLayerWithHeaders,
+} as const
