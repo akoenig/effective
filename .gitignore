@@ -45,4 +45,7 @@ temp/
 recordings/
 test-recordings/
 
+# Nix/direnv
+.direnv/
+
 /ai
