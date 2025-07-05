@@ -13,7 +13,11 @@
     "format": "biome format .",
     "format:fix": "biome format --write .",
     "check": "biome check .",
-    "check:fix": "biome check --write ."
+    "check:fix": "biome check --write .",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "changeset:status": "changeset status"
   },
   "keywords": [
     "effect",
@@ -24,6 +28,7 @@
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
+    "@changesets/cli": "^2.29.5",
     "@types/node": "^22.0.0",
     "typescript": "^5.8.3"
   }

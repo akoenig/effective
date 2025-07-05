@@ -1,14 +1,14 @@
 /**
  * @since 1.0.0
  */
-import { Schema } from "effect";
+import { Schema } from 'effect'
 
 /**
  * @since 1.0.0
  * @category errors
  */
 export class BodySerializationError extends Schema.TaggedError<BodySerializationError>()(
-  "BodySerializationError",
+  'BodySerializationError',
   {
     message: Schema.String,
     bodyType: Schema.String,

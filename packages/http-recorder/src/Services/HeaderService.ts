@@ -1,8 +1,8 @@
 /**
  * @since 1.0.0
  */
-import type { Config } from "effect";
-import { Effect } from "effect";
+import type { Config } from 'effect'
+import { Effect } from 'effect'
 
 /**
  * @since 1.0.0
@@ -10,7 +10,7 @@ import { Effect } from "effect";
  * @summary Service for processing and managing HTTP headers
  */
 export class HeaderService extends Effect.Service<HeaderService>()(
-  "@akoenig/effect-http-recorder/HeaderService",
+  '@akoenig/effect-http-recorder/HeaderService',
   {
     succeed: {
       /**
@@ -21,15 +21,15 @@ export class HeaderService extends Effect.Service<HeaderService>()(
         headers: Record<string, string>,
         excludedHeaders: Set<string>,
       ) {
-        const filtered: Record<string, string> = {};
+        const filtered: Record<string, string> = {}
 
         for (const [key, value] of Object.entries(headers)) {
           if (!excludedHeaders.has(key.toLowerCase())) {
-            filtered[key] = value;
+            filtered[key] = value
           }
         }
 
-        return filtered;
+        return filtered
       },
 
       /**
@@ -40,26 +40,26 @@ export class HeaderService extends Effect.Service<HeaderService>()(
         configHeaders: Record<string, Config.Config<string>> | undefined,
       ) {
         return Effect.gen(function* () {
-          const hasNoConfigHeaders = !configHeaders;
+          const hasNoConfigHeaders = !configHeaders
 
           if (hasNoConfigHeaders) {
-            return {};
+            return {}
           }
 
-          const resolvedHeaders: Record<string, string> = {};
+          const resolvedHeaders: Record<string, string> = {}
 
           for (const [key, configValue] of Object.entries(configHeaders)) {
             const value = yield* configValue.pipe(
-              Effect.orElse(() => Effect.succeed("")),
-            );
+              Effect.orElse(() => Effect.succeed('')),
+            )
 
             if (value) {
-              resolvedHeaders[key] = value;
+              resolvedHeaders[key] = value
             }
           }
 
-          return resolvedHeaders;
-        });
+          return resolvedHeaders
+        })
       },
 
       /**
@@ -67,7 +67,7 @@ export class HeaderService extends Effect.Service<HeaderService>()(
        * @since 1.0.0
        */
       mergeHeaders(...headerObjects: Array<Record<string, string>>) {
-        return Object.assign({}, ...headerObjects);
+        return Object.assign({}, ...headerObjects)
       },
 
       /**
@@ -81,7 +81,7 @@ export class HeaderService extends Effect.Service<HeaderService>()(
         return new Set([
           ...defaultHeaders,
           ...customHeaders.map((h) => h.toLowerCase()),
-        ]);
+        ])
       },
     },
   },
