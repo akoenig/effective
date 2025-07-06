@@ -34,12 +34,21 @@ const recorder = HttpRecorder.layer({
 // Your existing Effect code - no changes needed!
 const program = Effect.gen(function* () {
   const http = yield* HttpClient.HttpClient;
+
   return yield* http.get("https://api.example.com/data");
 });
 
 // Enable recording by providing the recorder layer
 const recordingApp = program.pipe(
-  Effect.provide(Layer.provideMerge(recorder, NodeHttpClient.layer))
+  Effect.provide(
+    Layer.provideMerge(
+      recorder,
+      Layer.mergeAll(
+        NodeHttpClient.layer,
+        NodeContext.layer
+      )
+    )
+  )
 );
 ```
 
@@ -56,12 +65,21 @@ const replayer = HttpReplayer.layer({ path: "./recordings" });
 // Same program - no code changes required!
 const program = Effect.gen(function* () {
   const http = yield* HttpClient.HttpClient;
+
   return yield* http.get("https://api.example.com/data");
 });
 
 // Enable replay mode by providing the replayer layer
 const replayingApp = program.pipe(
-  Effect.provide(replayer)
+  Effect.provide(
+    Layer.provideMerge(
+      replayer,
+      Layer.mergeAll(
+        NodeHttpClient.layer,
+        NodeContext.layer
+      )
+    )
+  )
 );
 ```
 
