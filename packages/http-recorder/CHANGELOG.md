@@ -1,5 +1,11 @@
 # @akoenig/effect-http-recorder
 
+## 1.0.2
+
+### Patch Changes
+
+- a4f054e: docs: update README with improved documentation
+
 ## 1.0.1
 
 ### Patch Changes
