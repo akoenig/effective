@@ -1,4 +1,4 @@
-# @akoenig/effect-http-recorder
+# Effect HTTP Recorder
 
 HTTP client recording and replay capabilities for Effect applications.
 
