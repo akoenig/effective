@@ -2,10 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
-    "tsBuildInfoFile": "./.tsbuildinfo"
+    "rootDir": "./",
+    "tsBuildInfoFile": "./.tsbuildinfo",
+    "composite": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "cli/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
   "references": [{ "path": "../http-recorder" }]
 }

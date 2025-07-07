@@ -1,9 +1,13 @@
 {
   "mcpServers": {
     "effect-docs": {
-      "command": "npx",
-      "args": ["-y", "effect-mcp"],
+      "command": "pnpx",
+      "args": ["effect-mcp"],
       "env": {}
+    },
+    "context7": {
+      "command": "pnpx",
+      "args": ["@upstash/context7-mcp"]
     }
   }
 }

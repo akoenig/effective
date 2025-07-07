@@ -4,6 +4,7 @@
 
 # GitHub
 
+- Nested values should be redacted
 - Tests? How?
 - Semantic errors instead of type attributes (see `domain/errors.ts`)
 - Integrate other endpoints
@@ -11,7 +12,8 @@
 - Refactor exports (only export what is really required)
 - GitHub actions npm publishing flow
 - `findMatchingRecording` should use Effect Schema
-- Refresh README
+- Refresh README (feature listing, e.g. automatic snake to camel case converstion, etc.)
+- Only export necessary modules from the entrypoint `mod.ts`
 
 
 - JSDoc for attributes in the response types (possible?)
