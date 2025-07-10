@@ -31,8 +31,7 @@ const cli = Command.run(main, {
   version: '1.0.0',
 })
 
-NodeRuntime.runMain(
-  cli(process.argv).pipe(
-    Effect.provide(Layer.mergeAll(NodeContext.layer, NodeHttpClient.layer)),
-  ),
+cli(process.argv).pipe(
+  Effect.provide(Layer.mergeAll(NodeContext.layer, NodeHttpClient.layer)),
+  NodeRuntime.runMain,
 )
