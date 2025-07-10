@@ -27,9 +27,9 @@
   "license": "MIT",
   "packageManager": "pnpm@10.12.4",
   "devDependencies": {
-    "@biomejs/biome": "2.0.6",
+    "@biomejs/biome": "2.1.1",
     "@changesets/cli": "^2.29.5",
-    "@types/node": "^22.16.0",
+    "@types/node": "^24.0.12",
     "typescript": "^5.8.3"
   }
 }
