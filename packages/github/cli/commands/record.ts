@@ -393,8 +393,13 @@ const redactGitHubData = (obj: unknown): unknown => {
 
   // Recursively process arrays and nested objects
   Object.keys(redacted).forEach((key) => {
-    if (typeof redacted[key as keyof typeof redacted] === 'object' && redacted[key as keyof typeof redacted] !== null) {
-      redacted[key as keyof typeof redacted] = redactGitHubData(redacted[key as keyof typeof redacted])
+    if (
+      typeof redacted[key as keyof typeof redacted] === 'object' &&
+      redacted[key as keyof typeof redacted] !== null
+    ) {
+      redacted[key as keyof typeof redacted] = redactGitHubData(
+        redacted[key as keyof typeof redacted],
+      )
     }
   })
 
