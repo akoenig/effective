@@ -33,7 +33,7 @@
     "directory": "packages/github"
   },
   "peerDependencies": {
-    "@effect/platform": "^0.87.6",
+    "@effect/platform": "^0.87.9",
     "effect": "^3.16.12"
   },
   "devDependencies": {
