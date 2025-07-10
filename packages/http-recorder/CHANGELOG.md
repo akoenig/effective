@@ -1,5 +1,11 @@
 # @akoenig/effect-http-recorder
 
+## 1.0.6
+
+### Patch Changes
+
+- 99aef9b: Version bump
+
 ## 1.0.5
 
 ### Patch Changes
