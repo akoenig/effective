@@ -9,6 +9,7 @@ import { Command } from '@effect/cli'
 import { HttpClient } from '@effect/platform'
 import { NodeContext, NodeHttpClient, NodeRuntime } from '@effect/platform-node'
 import { Effect, Layer } from 'effect'
+import { buildCommand } from './commands/build.js'
 import { cleanCommand } from './commands/clean.js'
 // Import subcommands
 import { recordCommand } from './commands/record.js'
@@ -21,7 +22,7 @@ const main = Command.make('github-sdk-cli', {}, () =>
   ),
 ).pipe(
   Command.withDescription('Internal development CLI for GitHub SDK'),
-  Command.withSubcommands([recordCommand, cleanCommand, testCommand]),
+  Command.withSubcommands([buildCommand, recordCommand, cleanCommand, testCommand]),
 )
 
 // Run the CLI

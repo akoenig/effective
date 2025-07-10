@@ -11,14 +11,14 @@ import { Console, Effect } from 'effect'
  */
 const runTests = Effect.gen(function* () {
   yield* Console.log('🧪 Running test suite...')
-  
+
   const command = Command.make('vitest', 'run').pipe(
     Command.stdout('inherit'),
-    Command.stderr('inherit')
+    Command.stderr('inherit'),
   )
-  
+
   const exitCode = yield* Command.exitCode(command)
-  
+
   if (exitCode === 0) {
     yield* Console.log('✅ Tests completed successfully')
   } else {
@@ -26,10 +26,6 @@ const runTests = Effect.gen(function* () {
   }
 })
 
-export const testCommand = CliCommand.make(
-  'test',
-  {},
-  () => runTests
-).pipe(
-  CliCommand.withDescription('Run the test suite')
+export const testCommand = CliCommand.make('test', {}, () => runTests).pipe(
+  CliCommand.withDescription('Run the test suite'),
 )

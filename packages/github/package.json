@@ -39,14 +39,12 @@
     "directory": "packages/github"
   },
   "scripts": {
-    "build": "tsc -b",
+    "cli:build": "tsx cli/main.ts build",
     "clean": "rm -rf dist .tsbuildinfo",
     "cli": "tsx cli/main.ts",
     "cli:clean": "tsx cli/main.ts clean",
     "cli:record": "tsx cli/main.ts record",
     "cli:test": "tsx cli/main.ts test",
-    "cli:test:record": "tsx cli/main.ts test --mode=record",
-    "cli:test:replay": "tsx cli/main.ts test --mode=replay",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"
