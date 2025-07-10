@@ -1,7 +1,7 @@
 {
   "name": "@akoenig/effect-http-recorder",
   "description": "HTTP client recording and replay capabilities for Effect",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "author": "André König <andre.koenig@openformation.io>",
   "devDependencies": {
     "@effect/platform-node": "0.89.3",
