@@ -29,8 +29,7 @@
     "format:fix": "biome format --write .",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
-    "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "test": "pnpm -r test"
   },
   "type": "module"
 }

@@ -8,7 +8,7 @@
 import {
   HttpRecorder,
   HttpRecorderConfig,
-  RedactionContext,
+  type RedactionContext,
   RedactionResult,
 } from '@akoenig/effect-http-recorder'
 import { Command, Options } from '@effect/cli'
@@ -81,7 +81,7 @@ const createGitHubRedactionEffect = (context: RedactionContext) => {
 /**
  * Recursively redact sensitive data while preserving GitHub API data structure
  */
-const redactGitHubData = (obj: any): any => {
+const redactGitHubData = (obj: unknown): unknown => {
   if (!obj || typeof obj !== 'object') {
     return obj
   }
@@ -90,7 +90,7 @@ const redactGitHubData = (obj: any): any => {
     return obj.map(redactGitHubData)
   }
 
-  const redacted = { ...obj }
+  const redacted = { ...(obj as Record<string, unknown>) }
 
   // IDs and unique identifiers
   if (
@@ -204,28 +204,28 @@ const redactGitHubData = (obj: any): any => {
   if ('url' in redacted && typeof redacted.url === 'string') {
     redacted.url = redacted.url
       // Replace GitHub.com URLs
-      .replace(/github\.com\/[^\/]+/g, 'github.com/example-user')
+      .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
       // Replace API URLs - handle all patterns
       .replace(
-        /api\.github\.com\/repos\/[^\/]+\/[^\/]+/g,
+        /api\.github\.com\/repos\/[^/]+\/[^/]+/g,
         'api.github.com/repos/example-user/example-repo',
       )
       .replace(
-        /api\.github\.com\/users\/[^\/]+/g,
+        /api\.github\.com\/users\/[^/]+/g,
         'api.github.com/users/example-user',
       )
       .replace(
-        /api\.github\.com\/orgs\/[^\/]+/g,
+        /api\.github\.com\/orgs\/[^/]+/g,
         'api.github.com/orgs/example-org',
       )
       // Handle the pattern: api.github.com/example-user/{actual-username}/{repo-name}
       .replace(
-        /api\.github\.com\/example-user\/[^\/]+\/[^\/]+/g,
+        /api\.github\.com\/example-user\/[^/]+\/[^/]+/g,
         'api.github.com/repos/example-user/example-repo',
       )
       // Handle the pattern: api.github.com/example-user/{actual-username}
       .replace(
-        /api\.github\.com\/example-user\/[^\/]+$/g,
+        /api\.github\.com\/example-user\/[^/]+$/g,
         'api.github.com/users/example-user',
       )
       // Replace PR and issue numbers
@@ -234,42 +234,42 @@ const redactGitHubData = (obj: any): any => {
   }
   if ('html_url' in redacted && typeof redacted.html_url === 'string') {
     redacted.html_url = redacted.html_url
-      .replace(/github\.com\/[^\/]+/g, 'github.com/example-user')
+      .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
       // Handle patterns where example-user is already present
       .replace(
-        /github\.com\/example-user\/[^\/]+/g,
+        /github\.com\/example-user\/[^/]+/g,
         'github.com/example-user/example-repo',
       )
   }
   if ('clone_url' in redacted && typeof redacted.clone_url === 'string') {
     redacted.clone_url = redacted.clone_url
-      .replace(/github\.com\/[^\/]+/g, 'github.com/example-user')
+      .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
       .replace(
-        /github\.com\/example-user\/[^\/]+/g,
+        /github\.com\/example-user\/[^/]+/g,
         'github.com/example-user/example-repo',
       )
   }
   if ('ssh_url' in redacted && typeof redacted.ssh_url === 'string') {
     redacted.ssh_url = redacted.ssh_url
-      .replace(/github\.com:[^\/]+/g, 'github.com:example-user')
+      .replace(/github\.com:[^/]+/g, 'github.com:example-user')
       .replace(
-        /github\.com:example-user\/[^\/]+/g,
+        /github\.com:example-user\/[^/]+/g,
         'github.com:example-user/example-repo',
       )
   }
   if ('git_url' in redacted && typeof redacted.git_url === 'string') {
     redacted.git_url = redacted.git_url
-      .replace(/github\.com\/[^\/]+/g, 'github.com/example-user')
+      .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
       .replace(
-        /github\.com\/example-user\/[^\/]+/g,
+        /github\.com\/example-user\/[^/]+/g,
         'github.com/example-user/example-repo',
       )
   }
   if ('svn_url' in redacted && typeof redacted.svn_url === 'string') {
     redacted.svn_url = redacted.svn_url
-      .replace(/github\.com\/[^\/]+/g, 'github.com/example-user')
+      .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
       .replace(
-        /github\.com\/example-user\/[^\/]+/g,
+        /github\.com\/example-user\/[^/]+/g,
         'github.com/example-user/example-repo',
       )
   }
@@ -284,11 +284,11 @@ const redactGitHubData = (obj: any): any => {
   ) {
     redacted.latest_comment_url = redacted.latest_comment_url
       .replace(
-        /api\.github\.com\/repos\/[^\/]+\/[^\/]+/g,
+        /api\.github\.com\/repos\/[^/]+\/[^/]+/g,
         'api.github.com/repos/example-user/example-repo',
       )
       .replace(
-        /api\.github\.com\/example-user\/[^\/]+\/[^\/]+/g,
+        /api\.github\.com\/example-user\/[^/]+\/[^/]+/g,
         'api.github.com/repos/example-user/example-repo',
       )
       .replace(/\/comments\/\d+/g, '/comments/12345')
@@ -347,31 +347,31 @@ const redactGitHubData = (obj: any): any => {
     if (field in redacted && typeof redacted[field] === 'string') {
       redacted[field] = redacted[field]
         // Replace GitHub.com URLs
-        .replace(/github\.com\/[^\/]+/g, 'github.com/example-user')
+        .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
         // Replace API URLs - handle all patterns
         .replace(
-          /api\.github\.com\/repos\/[^\/]+\/[^\/]+/g,
+          /api\.github\.com\/repos\/[^/]+\/[^/]+/g,
           'api.github.com/repos/example-user/example-repo',
         )
         .replace(
-          /api\.github\.com\/users\/[^\/]+/g,
+          /api\.github\.com\/users\/[^/]+/g,
           'api.github.com/users/example-user',
         )
         .replace(
-          /api\.github\.com\/orgs\/[^\/]+/g,
+          /api\.github\.com\/orgs\/[^/]+/g,
           'api.github.com/orgs/example-org',
         )
         // Handle patterns where example-user is already present
         .replace(
-          /api\.github\.com\/example-user\/[^\/]+\/[^\/]+/g,
+          /api\.github\.com\/example-user\/[^/]+\/[^/]+/g,
           'api.github.com/repos/example-user/example-repo',
         )
         .replace(
-          /api\.github\.com\/example-user\/[^\/]+(?=\/|$)/g,
+          /api\.github\.com\/example-user\/[^/]+(?=\/|$)/g,
           'api.github.com/users/example-user',
         )
         .replace(
-          /github\.com\/example-user\/[^\/]+/g,
+          /github\.com\/example-user\/[^/]+/g,
           'github.com/example-user/example-repo',
         )
     }
@@ -393,8 +393,8 @@ const redactGitHubData = (obj: any): any => {
 
   // Recursively process arrays and nested objects
   Object.keys(redacted).forEach((key) => {
-    if (typeof redacted[key] === 'object' && redacted[key] !== null) {
-      redacted[key] = redactGitHubData(redacted[key])
+    if (typeof redacted[key as keyof typeof redacted] === 'object' && redacted[key as keyof typeof redacted] !== null) {
+      redacted[key as keyof typeof redacted] = redactGitHubData(redacted[key as keyof typeof redacted])
     }
   })
 

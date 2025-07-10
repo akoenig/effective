@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: nix develop --command pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: nix develop --command pnpm typecheck
+      - name: Build
+        run: nix develop --command pnpm build
 
       - name: Lint
         run: nix develop --command pnpm lint

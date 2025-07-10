@@ -1,22 +1,17 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": {
-    "enabled": false,
+    "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false
-  },
-  "files": {
-    "ignoreUnknown": false
+    "useIgnoreFile": true
   },
   "formatter": {
     "enabled": true,
-    "includes": ["packages/**/src/**/*.ts"],
     "indentStyle": "space",
     "indentWidth": 2
   },
   "linter": {
     "enabled": true,
-    "includes": ["packages/**/src/**/*.ts"],
     "rules": {
       "recommended": true
     }

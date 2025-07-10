@@ -6,7 +6,6 @@
  */
 
 import { Command } from '@effect/cli'
-import { HttpClient } from '@effect/platform'
 import { NodeContext, NodeHttpClient, NodeRuntime } from '@effect/platform-node'
 import { Effect, Layer } from 'effect'
 import { buildCommand } from './commands/build.js'

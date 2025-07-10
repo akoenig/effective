@@ -3,7 +3,7 @@ import { NodeContext, NodeHttpClient } from '@effect/platform-node'
 import { Effect, Layer } from 'effect'
 import { HttpRecorder, HttpReplayer } from '../dist/mod.js'
 
-const recorder = HttpRecorder.layer({
+const _recorder = HttpRecorder.layer({
   path: './recordings',
 })
 
