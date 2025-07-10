@@ -17,7 +17,7 @@
     "build": "tsc -b",
     "clean": "rm -rf dist .tsbuildinfo",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "keywords": [
     "effect",
@@ -34,7 +34,7 @@
     "directory": "packages/http-recorder"
   },
   "peerDependencies": {
-    "@effect/platform": "^0.87.6",
+    "@effect/platform": "^0.87.9",
     "effect": "^3.16.12"
   },
   "devDependencies": {
