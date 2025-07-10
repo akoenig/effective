@@ -1,43 +1,51 @@
 {
   "name": "@akoenig/effect-github",
-  "version": "0.0.0",
-  "private": true,
   "description": "GitHub SDK for Effect",
-  "type": "module",
+  "version": "0.0.0",
+  "author": "André König <andre.koenig@openformation.io>",
+  "devDependencies": {
+    "@akoenig/effect-http-recorder": "workspace:*",
+    "@effect/cli": "0.66.11",
+    "@effect/platform-node": "0.89.3",
+    "tsx": "4.20.3"
+  },
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/mod.d.ts",
+      "import": "./dist/mod.js"
     }
   },
   "files": [
     "dist",
     "src"
   ],
-  "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf dist .tsbuildinfo",
-    "typecheck": "tsc --noEmit"
-  },
   "keywords": [
+    "api",
     "effect",
     "github",
-    "sdk",
-    "api"
+    "sdk"
   ],
-  "author": "André König <andre.koenig@openformation.io>",
   "license": "MIT",
+  "peerDependencies": {
+    "@effect/platform": "^0.87.11",
+    "effect": "^3.16.12"
+  },
+  "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/akoenig/effective.git",
     "directory": "packages/github"
   },
-  "peerDependencies": {
-    "@effect/platform": "^0.87.6",
-    "effect": "^3.16.12"
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist .tsbuildinfo",
+    "cli": "tsx cli/main.ts",
+    "cli:clean": "tsx cli/main.ts clean",
+    "cli:record": "tsx cli/main.ts record",
+    "cli:test": "tsx cli/main.ts test",
+    "cli:test:record": "tsx cli/main.ts test --mode=record",
+    "cli:test:replay": "tsx cli/main.ts test --mode=replay",
+    "typecheck": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@akoenig/effect-http-recorder": "workspace:*",
-    "@effect/platform-node": "^0.88.11"
-  }
+  "type": "module"
 }

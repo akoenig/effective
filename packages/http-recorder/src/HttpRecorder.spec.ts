@@ -19,12 +19,14 @@ const NodeLayer = Layer.mergeAll(
   NodeFileSystem.layer,
   NodePath.layer,
 )
+
 const rootTestRecordingsPath = './test-recordings'
 const getTestRecordingsPath = (testName: string) =>
   `${rootTestRecordingsPath}/${testName}-${Date.now()}-${Math.random()
     .toString(36)
     .substring(7)}`
 const testUrl = 'https://jsonplaceholder.typicode.com/users/1/posts'
+
 describe('HttpRecorder', () => {
   // Clean up the root test recordings directory after all tests
   afterAll(async () => {
@@ -36,6 +38,7 @@ describe('HttpRecorder', () => {
       }
     }).pipe(Effect.provide(NodeFileSystem.layer), Effect.runPromise)
   })
+
   describe('Record Mode', () => {
     it.effect(
       'should record GET requests with correct file name format',

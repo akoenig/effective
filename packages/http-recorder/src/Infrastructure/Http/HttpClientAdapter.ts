@@ -3,7 +3,7 @@
  */
 import type { HttpClientRequest } from '@effect/platform'
 import { HttpClientResponse } from '@effect/platform'
-import { Effect } from 'effect'
+import { Effect, Predicate } from 'effect'
 import type { RecordedTransaction } from '../../Domain/Entities/RecordedTransaction.js'
 import { TransactionSerializer } from '../Serialization/TransactionSerializer.js'
 
@@ -38,7 +38,12 @@ export class HttpClientAdapter extends Effect.Service<HttpClientAdapter>()(
                   transaction.response.body,
                 )
 
-            const webResponse = new Response(bodyString, {
+            // Handle empty response bodies regardless of status code using Effect utilities
+            // This is more robust than checking specific status codes
+            const isEmpty = Predicate.not(Predicate.isTruthy)
+            const responseBody = isEmpty(transaction.response.body) ? null : bodyString
+
+            const webResponse = new Response(responseBody, {
               status: transaction.response.status,
               headers: transaction.response.headers,
             })

@@ -1,35 +1,36 @@
 {
   "name": "@akoenig/effective",
-  "version": "1.0.0",
-  "private": true,
   "description": "Monorepo for Effect-based packages",
-  "type": "module",
-  "scripts": {
-    "build": "pnpm -r build",
-    "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck",
-    "lint": "biome lint .",
-    "lint:fix": "biome lint --write .",
-    "format": "biome format .",
-    "format:fix": "biome format --write .",
-    "check": "biome check .",
-    "check:fix": "biome check --write .",
-    "changeset": "changeset",
-    "changeset:version": "changeset version",
-    "changeset:publish": "changeset publish",
-    "changeset:status": "changeset status"
+  "version": "1.0.0",
+  "author": "André König <andre.koenig@openformation.io>",
+  "devDependencies": {
+    "@biomejs/biome": "2.1.1",
+    "@changesets/cli": "^2.29.5",
+    "@types/node": "^22.16.2",
+    "syncpack": "14.0.0-alpha.18",
+    "typescript": "^5.8.3"
   },
   "keywords": [
     "effect",
     "typescript"
   ],
-  "author": "André König <andre.koenig@openformation.io>",
   "license": "MIT",
   "packageManager": "pnpm@10.12.4",
-  "devDependencies": {
-    "@biomejs/biome": "2.0.6",
-    "@changesets/cli": "^2.29.5",
-    "@types/node": "^22.16.0",
-    "typescript": "^5.8.3"
-  }
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "changeset": "changeset",
+    "changeset:publish": "changeset publish",
+    "changeset:status": "changeset status",
+    "changeset:version": "changeset version",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "type": "module"
 }

@@ -1,45 +1,45 @@
 {
   "name": "@akoenig/effect-http-recorder",
-  "version": "1.0.2",
   "description": "HTTP client recording and replay capabilities for Effect",
-  "type": "module",
+  "version": "1.0.2",
+  "author": "André König <andre.koenig@openformation.io>",
+  "devDependencies": {
+    "@effect/platform-node": "0.89.3",
+    "@effect/vitest": "0.23.12",
+    "vitest": "3.2.4"
+  },
   "exports": {
     ".": {
-      "import": "./dist/mod.js",
-      "types": "./dist/mod.d.ts"
+      "types": "./dist/mod.d.ts",
+      "import": "./dist/mod.js"
     }
   },
   "files": [
     "dist",
     "src"
   ],
-  "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf dist .tsbuildinfo",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest"
-  },
   "keywords": [
     "effect",
     "http",
     "recording",
-    "testing",
-    "replay"
+    "replay",
+    "testing"
   ],
-  "author": "André König <andre.koenig@openformation.io>",
   "license": "MIT",
+  "peerDependencies": {
+    "@effect/platform": "^0.87.11",
+    "effect": "^3.16.12"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/akoenig/effective.git",
     "directory": "packages/http-recorder"
   },
-  "peerDependencies": {
-    "@effect/platform": "^0.87.6",
-    "effect": "^3.16.12"
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist .tsbuildinfo",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@effect/platform-node": "^0.88.11",
-    "@effect/vitest": "^0.23.12",
-    "vitest": "^3.2.4"
-  }
+  "type": "module"
 }
