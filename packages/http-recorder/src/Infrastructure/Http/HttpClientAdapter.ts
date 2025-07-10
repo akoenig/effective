@@ -41,7 +41,9 @@ export class HttpClientAdapter extends Effect.Service<HttpClientAdapter>()(
             // Handle empty response bodies regardless of status code using Effect utilities
             // This is more robust than checking specific status codes
             const isEmpty = Predicate.not(Predicate.isTruthy)
-            const responseBody = isEmpty(transaction.response.body) ? null : bodyString
+            const responseBody = isEmpty(transaction.response.body)
+              ? null
+              : bodyString
 
             const webResponse = new Response(responseBody, {
               status: transaction.response.status,

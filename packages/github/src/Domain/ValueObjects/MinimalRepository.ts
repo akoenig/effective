@@ -17,20 +17,20 @@ export const MinimalRepository = Schema.Struct({
     Schema.fromKey('full_name'),
   ),
   owner: User,
-  
+
   // Basic properties
   private: Schema.Boolean,
   fork: Schema.Boolean,
   description: Schema.NullOr(Schema.String),
   archived: Schema.optional(Schema.Boolean),
   disabled: Schema.optional(Schema.Boolean),
-  
+
   // Essential URLs
   htmlUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('html_url'),
   ),
   url: Schema.String,
-  
+
   // All the URL templates (required in minimal-repository)
   archiveUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('archive_url'),
@@ -140,14 +140,14 @@ export const MinimalRepository = Schema.Struct({
   treesUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('trees_url'),
   ),
-  
+
   // Basic repo URLs (optional as they're not in all API responses)
   cloneUrl: Schema.optionalWith(Schema.String, { exact: true }).pipe(
     Schema.fromKey('clone_url'),
   ),
-  mirrorUrl: Schema.optionalWith(Schema.NullOr(Schema.String), { exact: true }).pipe(
-    Schema.fromKey('mirror_url'),
-  ),
+  mirrorUrl: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    exact: true,
+  }).pipe(Schema.fromKey('mirror_url')),
   sshUrl: Schema.optionalWith(Schema.String, { exact: true }).pipe(
     Schema.fromKey('ssh_url'),
   ),
@@ -188,12 +188,12 @@ export const MinimalRepository = Schema.Struct({
   hasDownloads: Schema.optionalWith(Schema.Boolean, { exact: true }).pipe(
     Schema.fromKey('has_downloads'),
   ),
-  hasDiscussions: Schema.optionalWith(Schema.Boolean, { default: () => false }).pipe(
-    Schema.fromKey('has_discussions'),
-  ),
-  pushedAt: Schema.optionalWith(Schema.NullOr(Schema.String), { exact: true }).pipe(
-    Schema.fromKey('pushed_at'),
-  ),
+  hasDiscussions: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('has_discussions')),
+  pushedAt: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    exact: true,
+  }).pipe(Schema.fromKey('pushed_at')),
   createdAt: Schema.optionalWith(Schema.String, { exact: true }).pipe(
     Schema.fromKey('created_at'),
   ),

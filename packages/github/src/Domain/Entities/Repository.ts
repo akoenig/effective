@@ -16,7 +16,7 @@ export const Repository = Schema.Struct({
     Schema.fromKey('full_name'),
   ),
   owner: User,
-  
+
   // Basic properties
   private: Schema.Boolean,
   fork: Schema.Boolean,
@@ -25,7 +25,7 @@ export const Repository = Schema.Struct({
   archived: Schema.Boolean,
   disabled: Schema.Boolean,
   visibility: Schema.String,
-  
+
   // URLs
   htmlUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('html_url'),
@@ -47,7 +47,7 @@ export const Repository = Schema.Struct({
     Schema.fromKey('mirror_url'),
   ),
   homepage: Schema.NullOr(Schema.String),
-  
+
   // Features and settings
   hasIssues: Schema.propertySignature(Schema.Boolean).pipe(
     Schema.fromKey('has_issues'),
@@ -64,10 +64,10 @@ export const Repository = Schema.Struct({
   hasDownloads: Schema.propertySignature(Schema.Boolean).pipe(
     Schema.fromKey('has_downloads'),
   ),
-  hasDiscussions: Schema.optionalWith(Schema.Boolean, { default: () => false }).pipe(
-    Schema.fromKey('has_discussions'),
-  ),
-  
+  hasDiscussions: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('has_discussions')),
+
   // Counts and statistics
   stargazersCount: Schema.propertySignature(Schema.Number).pipe(
     Schema.fromKey('stargazers_count'),
@@ -87,12 +87,12 @@ export const Repository = Schema.Struct({
     Schema.fromKey('open_issues'),
   ),
   size: Schema.Number, // Size in KB
-  
+
   // Branching and version control
   defaultBranch: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('default_branch'),
   ),
-  
+
   // Timestamps
   pushedAt: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
     Schema.fromKey('pushed_at'),
@@ -103,13 +103,13 @@ export const Repository = Schema.Struct({
   updatedAt: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('updated_at'),
   ),
-  
+
   // Optional fields that may appear in some contexts
   license: Schema.optional(Schema.NullOr(Schema.Any)), // License can be null or a complex object
   topics: Schema.optional(Schema.Array(Schema.String)),
-  isTemplate: Schema.optionalWith(Schema.Boolean, { default: () => false }).pipe(
-    Schema.fromKey('is_template'),
-  ),
+  isTemplate: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('is_template')),
 })
 
 export type Repository = Schema.Schema.Type<typeof Repository>

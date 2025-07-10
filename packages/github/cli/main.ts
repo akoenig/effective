@@ -22,7 +22,12 @@ const main = Command.make('github-sdk-cli', {}, () =>
   ),
 ).pipe(
   Command.withDescription('Internal development CLI for GitHub SDK'),
-  Command.withSubcommands([buildCommand, recordCommand, cleanCommand, testCommand]),
+  Command.withSubcommands([
+    buildCommand,
+    recordCommand,
+    cleanCommand,
+    testCommand,
+  ]),
 )
 
 // Run the CLI

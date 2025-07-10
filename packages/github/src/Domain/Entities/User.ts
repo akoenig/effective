@@ -12,7 +12,7 @@ export const User = Schema.Struct({
     Schema.fromKey('node_id'),
   ),
   login: Schema.String,
-  
+
   // Avatar and profile (required)
   avatarUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('avatar_url'),
@@ -20,7 +20,7 @@ export const User = Schema.Struct({
   gravatarId: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
     Schema.fromKey('gravatar_id'),
   ),
-  
+
   // URLs (required)
   url: Schema.String,
   htmlUrl: Schema.propertySignature(Schema.String).pipe(
@@ -53,13 +53,13 @@ export const User = Schema.Struct({
   receivedEventsUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('received_events_url'),
   ),
-  
+
   // User type and permissions (required)
   type: Schema.String,
   siteAdmin: Schema.propertySignature(Schema.Boolean).pipe(
     Schema.fromKey('site_admin'),
   ),
-  
+
   // Optional fields that may appear in some contexts
   name: Schema.optional(Schema.NullOr(Schema.String)),
   email: Schema.optional(Schema.NullOr(Schema.String)),

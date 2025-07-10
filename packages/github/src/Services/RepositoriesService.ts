@@ -13,7 +13,6 @@ import {
 import { GitHubAuthService } from '../Infrastructure/Auth/GitHubAuthService.js'
 import { GitHubHttpClientService } from '../Infrastructure/Http/GitHubHttpClientService.js'
 
-
 type RepositoryServiceError =
   | RepositoryError
   | AuthError

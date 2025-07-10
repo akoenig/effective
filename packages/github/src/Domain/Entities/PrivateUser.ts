@@ -9,7 +9,7 @@ import { User } from './User.js'
 export const PrivateUser = Schema.Struct({
   // Extend from simple user
   ...User.fields,
-  
+
   // Additional required fields for private user
   name: Schema.NullOr(Schema.String),
   email: Schema.NullOr(Schema.String),
@@ -21,7 +21,7 @@ export const PrivateUser = Schema.Struct({
   twitterUsername: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
     Schema.fromKey('twitter_username'),
   ),
-  
+
   // Counts (required for private user)
   publicRepos: Schema.propertySignature(Schema.Number).pipe(
     Schema.fromKey('public_repos'),
@@ -31,7 +31,7 @@ export const PrivateUser = Schema.Struct({
   ),
   followers: Schema.Number,
   following: Schema.Number,
-  
+
   // Timestamps (required for private user)
   createdAt: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('created_at'),
@@ -39,7 +39,7 @@ export const PrivateUser = Schema.Struct({
   updatedAt: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('updated_at'),
   ),
-  
+
   // Private user specific fields (optional)
   privateGists: Schema.optionalWith(Schema.Number, { exact: true }).pipe(
     Schema.fromKey('private_gists'),
@@ -54,26 +54,28 @@ export const PrivateUser = Schema.Struct({
     Schema.fromKey('disk_usage'),
   ),
   collaborators: Schema.optionalWith(Schema.Number, { exact: true }),
-  twoFactorAuthentication: Schema.optionalWith(Schema.Boolean, { exact: true }).pipe(
-    Schema.fromKey('two_factor_authentication'),
-  ),
-  notificationEmail: Schema.optionalWith(Schema.NullOr(Schema.String), { exact: true }).pipe(
-    Schema.fromKey('notification_email'),
-  ),
+  twoFactorAuthentication: Schema.optionalWith(Schema.Boolean, {
+    exact: true,
+  }).pipe(Schema.fromKey('two_factor_authentication')),
+  notificationEmail: Schema.optionalWith(Schema.NullOr(Schema.String), {
+    exact: true,
+  }).pipe(Schema.fromKey('notification_email')),
   businessPlus: Schema.optionalWith(Schema.Boolean, { exact: true }).pipe(
     Schema.fromKey('business_plus'),
   ),
   ldapDn: Schema.optionalWith(Schema.String, { exact: true }).pipe(
     Schema.fromKey('ldap_dn'),
   ),
-  plan: Schema.optional(Schema.Struct({
-    collaborators: Schema.Number,
-    name: Schema.String,
-    space: Schema.Number,
-    privateRepos: Schema.propertySignature(Schema.Number).pipe(
-      Schema.fromKey('private_repos'),
-    ),
-  })),
+  plan: Schema.optional(
+    Schema.Struct({
+      collaborators: Schema.Number,
+      name: Schema.String,
+      space: Schema.Number,
+      privateRepos: Schema.propertySignature(Schema.Number).pipe(
+        Schema.fromKey('private_repos'),
+      ),
+    }),
+  ),
 })
 
 export type PrivateUser = Schema.Schema.Type<typeof PrivateUser>

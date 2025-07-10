@@ -162,120 +162,139 @@ describe('HttpReplayer', () => {
       )
     })
 
-    it.effect('should handle empty responses (any status code with null/empty body)', () => {
-      const testRecordingsPath = getTestRecordingsPath('empty-responses')
-      return Effect.gen(function* () {
-        const fs = yield* FileSystem.FileSystem
-        const path = yield* Path.Path
-        
-        // Clean up any existing test subdirectory
-        yield* fs.exists(testRecordingsPath).pipe(
-          Effect.flatMap((exists) =>
-            exists ? fs.remove(testRecordingsPath) : Effect.succeed(undefined),
-          ),
-          Effect.catchAll(() => Effect.succeed(undefined)),
-        )
-        // Ensure test subdirectory exists
-        yield* fs
-          .makeDirectory(testRecordingsPath, { recursive: true })
-          .pipe(Effect.catchAll(() => Effect.succeed(undefined)))
+    it.effect(
+      'should handle empty responses (any status code with null/empty body)',
+      () => {
+        const testRecordingsPath = getTestRecordingsPath('empty-responses')
+        return Effect.gen(function* () {
+          const fs = yield* FileSystem.FileSystem
+          const path = yield* Path.Path
 
-        // Create mock recordings for various status codes with empty bodies
-        const baseTimestamp = Date.now()
-        
-        const recordings = [
-          {
-            suffix: "204",
-            method: "DELETE", 
-            url: "https://api.example.com/resource/204",
-            status: 204,
-            body: null,
-            description: "204 No Content"
-          },
-          {
-            suffix: "205",
-            method: "PUT",
-            url: "https://api.example.com/resource/205", 
-            status: 205,
-            body: null,
-            description: "205 Reset Content"
-          },
-          {
-            suffix: "304",
-            method: "GET",
-            url: "https://api.example.com/resource/304",
-            status: 304,
-            body: null, 
-            description: "304 Not Modified"
-          },
-          {
-            suffix: "200-empty",
-            method: "GET", 
-            url: "https://api.example.com/resource/200-empty",
-            status: 200,
-            body: "", // Empty string body
-            description: "200 OK with empty body"
-          }
-        ]
+          // Clean up any existing test subdirectory
+          yield* fs.exists(testRecordingsPath).pipe(
+            Effect.flatMap((exists) =>
+              exists
+                ? fs.remove(testRecordingsPath)
+                : Effect.succeed(undefined),
+            ),
+            Effect.catchAll(() => Effect.succeed(undefined)),
+          )
+          // Ensure test subdirectory exists
+          yield* fs
+            .makeDirectory(testRecordingsPath, { recursive: true })
+            .pipe(Effect.catchAll(() => Effect.succeed(undefined)))
 
-        // Create recording files for each scenario
-        for (const [index, recording] of recordings.entries()) {
-          const timestamp = baseTimestamp + (index * 1000)
-          const recordingData = {
-            id: `${timestamp}__${recording.method}_resource-${recording.suffix}`,
-            request: {
-              method: recording.method,
-              url: recording.url,
-              headers: {
-                "accept": "application/json"
-              }
+          // Create mock recordings for various status codes with empty bodies
+          const baseTimestamp = Date.now()
+
+          const recordings = [
+            {
+              suffix: '204',
+              method: 'DELETE',
+              url: 'https://api.example.com/resource/204',
+              status: 204,
+              body: null,
+              description: '204 No Content',
             },
-            response: {
-              status: recording.status,
-              headers: {
-                "content-type": "application/json"
+            {
+              suffix: '205',
+              method: 'PUT',
+              url: 'https://api.example.com/resource/205',
+              status: 205,
+              body: null,
+              description: '205 Reset Content',
+            },
+            {
+              suffix: '304',
+              method: 'GET',
+              url: 'https://api.example.com/resource/304',
+              status: 304,
+              body: null,
+              description: '304 Not Modified',
+            },
+            {
+              suffix: '200-empty',
+              method: 'GET',
+              url: 'https://api.example.com/resource/200-empty',
+              status: 200,
+              body: '', // Empty string body
+              description: '200 OK with empty body',
+            },
+          ]
+
+          // Create recording files for each scenario
+          for (const [index, recording] of recordings.entries()) {
+            const timestamp = baseTimestamp + index * 1000
+            const recordingData = {
+              id: `${timestamp}__${recording.method}_resource-${recording.suffix}`,
+              request: {
+                method: recording.method,
+                url: recording.url,
+                headers: {
+                  accept: 'application/json',
+                },
               },
-              body: recording.body
+              response: {
+                status: recording.status,
+                headers: {
+                  'content-type': 'application/json',
+                },
+                body: recording.body,
+              },
+              timestamp: new Date(timestamp).toISOString(),
+            }
+
+            const recordingPath = path.join(
+              testRecordingsPath,
+              `${timestamp}__${recording.method}_resource-${recording.suffix}.json`,
+            )
+            yield* fs.writeFileString(
+              recordingPath,
+              JSON.stringify(recordingData, null, 2),
+            )
+          }
+
+          // Now test replaying these empty responses
+          const client = yield* HttpClient.HttpClient
+
+          // Test 204 No Content response
+          const response204 = yield* client.del(
+            'https://api.example.com/resource/204',
+          )
+          expect(response204.status).toBe(204)
+
+          // Test 205 Reset Content response
+          const response205 = yield* client.put(
+            'https://api.example.com/resource/205',
+            {
+              body: HttpBody.text('{}'),
+              headers: {
+                'content-type': 'application/json',
+              },
             },
-            timestamp: new Date(timestamp).toISOString()
-          }
-          
-          const recordingPath = path.join(testRecordingsPath, `${timestamp}__${recording.method}_resource-${recording.suffix}.json`)
-          yield* fs.writeFileString(recordingPath, JSON.stringify(recordingData, null, 2))
-        }
+          )
+          expect(response205.status).toBe(205)
 
-        // Now test replaying these empty responses
-        const client = yield* HttpClient.HttpClient
+          // Test 304 Not Modified response
+          const response304 = yield* client.get(
+            'https://api.example.com/resource/304',
+          )
+          expect(response304.status).toBe(304)
 
-        // Test 204 No Content response
-        const response204 = yield* client.del('https://api.example.com/resource/204')
-        expect(response204.status).toBe(204)
-        
-        // Test 205 Reset Content response  
-        const response205 = yield* client.put('https://api.example.com/resource/205', {
-          body: HttpBody.text('{}'),
-          headers: {
-            'content-type': 'application/json'
-          }
-        })
-        expect(response205.status).toBe(205)
-        
-        // Test 304 Not Modified response
-        const response304 = yield* client.get('https://api.example.com/resource/304')
-        expect(response304.status).toBe(304)
-        
-        // Test 200 OK with empty body
-        const response200Empty = yield* client.get('https://api.example.com/resource/200-empty')
-        expect(response200Empty.status).toBe(200)
-
-      }).pipe(
-        Effect.provide(
-          Layer.provideMerge(
-            HttpReplayer.layer({ path: testRecordingsPath }),
-            NodeLayer,
+          // Test 200 OK with empty body
+          const response200Empty = yield* client.get(
+            'https://api.example.com/resource/200-empty',
+          )
+          expect(response200Empty.status).toBe(200)
+        }).pipe(
+          Effect.provide(
+            Layer.provideMerge(
+              HttpReplayer.layer({ path: testRecordingsPath }),
+              NodeLayer,
+            ),
           ),
-        ),
-      )
-    })
+        )
+      },
+    )
   })
 })

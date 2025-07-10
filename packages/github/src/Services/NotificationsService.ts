@@ -13,7 +13,6 @@ import {
 import { GitHubAuthService } from '../Infrastructure/Auth/GitHubAuthService.js'
 import { GitHubHttpClientService } from '../Infrastructure/Http/GitHubHttpClientService.js'
 
-
 type NotificationServiceError =
   | NotificationError
   | AuthError
@@ -137,9 +136,7 @@ export class NotificationsService extends Effect.Service<NotificationsService>()
             )
 
           // Decode snake_case response to camelCase
-          return yield* Schema.decodeUnknown(Notification)(
-            rawNotification,
-          )
+          return yield* Schema.decodeUnknown(Notification)(rawNotification)
         })
 
       const markThreadAsRead = (
