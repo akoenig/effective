@@ -1,5 +1,5 @@
 {
-  "id": "1752160756909__GET_repos-effect-ts-effect",
+  "id": "1752170736303__GET_repos-effect-ts-effect",
   "request": {
     "method": "GET",
     "url": "https://api.github.com/repos/effect-ts/effect",
@@ -118,8 +118,8 @@
       "svn_url": "https://github.com/example-user/example-repo",
       "homepage": "https://example.com",
       "size": 87365,
-      "stargazers_count": 10433,
-      "watchers_count": 10433,
+      "stargazers_count": 10434,
+      "watchers_count": 10434,
       "language": "TypeScript",
       "has_issues": true,
       "has_projects": true,
@@ -160,7 +160,7 @@
       "visibility": "public",
       "forks": 355,
       "open_issues": 306,
-      "watchers": 10433,
+      "watchers": 10434,
       "default_branch": "main",
       "permissions": {
         "admin": false,
@@ -196,5 +196,5 @@
       "subscribers_count": 27
     }
   },
-  "timestamp": "2025-07-10T15:19:16.909Z"
+  "timestamp": "2025-07-10T18:05:36.303Z"
 }

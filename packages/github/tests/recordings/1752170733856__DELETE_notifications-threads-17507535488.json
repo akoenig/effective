@@ -1,24 +1,19 @@
 {
-  "id": "1752160754739__PUT_notifications",
+  "id": "1752170733856__DELETE_notifications-threads-17507535488",
   "request": {
-    "method": "PUT",
-    "url": "https://api.github.com/notifications",
+    "method": "DELETE",
+    "url": "https://api.github.com/notifications/threads/17507535488",
     "headers": {
       "user-agent": "***REDACTED***",
       "accept": "***REDACTED***",
       "x-github-api-version": "***REDACTED***",
-      "authorization": "***REDACTED***",
-      "content-type": "***REDACTED***",
-      "content-length": "***REDACTED***"
-    },
-    "body": "{}"
+      "authorization": "***REDACTED***"
+    }
   },
   "response": {
-    "status": 205,
+    "status": 204,
     "headers": {
       "date": "***REDACTED***",
-      "content-type": "***REDACTED***",
-      "content-length": "***REDACTED***",
       "x-oauth-scopes": "***REDACTED***",
       "x-accepted-oauth-scopes": "***REDACTED***",
       "x-oauth-client-id": "***REDACTED***",
@@ -44,5 +39,5 @@
     },
     "body": null
   },
-  "timestamp": "2025-07-10T15:19:14.739Z"
+  "timestamp": "2025-07-10T18:05:33.856Z"
 }

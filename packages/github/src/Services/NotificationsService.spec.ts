@@ -43,8 +43,7 @@ describe('NotificationsService', () => {
 
         expect(result.data).toBeDefined()
         expect(Array.isArray(result.data)).toBe(true)
-        // The recording shows empty notifications, so we expect 0 items
-        expect(result.data.length).toBe(0)
+        expect(result.data.length).toBe(37)
       }).pipe(Effect.provide(TestLayer)),
     )
 
@@ -58,6 +57,7 @@ describe('NotificationsService', () => {
 
         expect(result.data).toBeDefined()
         expect(Array.isArray(result.data)).toBe(true)
+        expect(result.data.length).toBe(37)
       }).pipe(Effect.provide(TestLayer)),
     )
 
@@ -71,18 +71,6 @@ describe('NotificationsService', () => {
 
         expect(result.data).toBeDefined()
         expect(Array.isArray(result.data)).toBe(true)
-      }).pipe(Effect.provide(TestLayer)),
-    )
-
-    it.effect('should handle empty notification list', () =>
-      Effect.gen(function* () {
-        const notifications = yield* NotificationsService
-        // The recording shows empty notifications array
-        const result = yield* notifications.listForAuthenticatedUser()
-
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
-        expect(result.data.length).toBe(0)
       }).pipe(Effect.provide(TestLayer)),
     )
   })
@@ -173,25 +161,29 @@ describe('NotificationsService', () => {
   })
 
   describe('Response Parsing', () => {
-    it.effect('should properly parse snake_case to camelCase using getThread', () =>
-      Effect.gen(function* () {
-        const notifications = yield* NotificationsService
-        // Use getThread since it returns actual notification data
-        const notification = yield* notifications.getThread('17507535488')
+    it.effect(
+      'should properly parse snake_case to camelCase using getThread',
+      () =>
+        Effect.gen(function* () {
+          const notifications = yield* NotificationsService
+          // Use getThread since it returns actual notification data
+          const notification = yield* notifications.getThread('17507535488')
 
-        // Verify camelCase conversion
-        expect(notification).toHaveProperty('updatedAt') // from updated_at
-        expect(notification.updatedAt).toBe('2023-01-01T00:00:00Z')
-        expect(notification).toHaveProperty('lastReadAt') // from last_read_at
-        expect(notification.lastReadAt).toBeNull()
-        expect(notification).toHaveProperty('subscriptionUrl') // from subscription_url
+          // Verify camelCase conversion
+          expect(notification).toHaveProperty('updatedAt') // from updated_at
+          expect(notification.updatedAt).toBe('2023-01-01T00:00:00Z')
+          expect(notification).toHaveProperty('lastReadAt') // from last_read_at
+          expect(notification.lastReadAt).toBeNull()
+          expect(notification).toHaveProperty('subscriptionUrl') // from subscription_url
 
-        // Verify nested objects are also converted
-        expect(notification.subject).toHaveProperty('latestCommentUrl') // from latest_comment_url
-        expect(notification.repository).toHaveProperty('fullName') // from full_name
-        expect(notification.repository.fullName).toBe('example-user/example-repo')
-        expect(notification.repository).toHaveProperty('htmlUrl') // from html_url
-      }).pipe(Effect.provide(TestLayer)),
+          // Verify nested objects are also converted
+          expect(notification.subject).toHaveProperty('latestCommentUrl') // from latest_comment_url
+          expect(notification.repository).toHaveProperty('fullName') // from full_name
+          expect(notification.repository.fullName).toBe(
+            'example-user/example-repo',
+          )
+          expect(notification.repository).toHaveProperty('htmlUrl') // from html_url
+        }).pipe(Effect.provide(TestLayer)),
     )
   })
 })

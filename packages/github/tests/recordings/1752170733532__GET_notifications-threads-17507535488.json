@@ -1,5 +1,5 @@
 {
-  "id": "1752160753948__GET_notifications-threads-17507535488",
+  "id": "1752170733532__GET_notifications-threads-17507535488",
   "request": {
     "method": "GET",
     "url": "https://api.github.com/notifications/threads/17507535488",
@@ -126,5 +126,5 @@
       "subscription_url": "https://api.github.com/repos/example-user/example-repo/subscription"
     }
   },
-  "timestamp": "2025-07-10T15:19:13.948Z"
+  "timestamp": "2025-07-10T18:05:33.532Z"
 }

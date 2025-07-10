@@ -1,5 +1,5 @@
 {
-  "id": "1752160757139__GET_repos-non-existent-owner-12345-non-existent-repo-67890",
+  "id": "1752170736523__GET_repos-non-existent-owner-12345-non-existent-repo-67890",
   "request": {
     "method": "GET",
     "url": "https://api.github.com/repos/non-existent-owner-12345/non-existent-repo-67890",
@@ -45,5 +45,5 @@
       "status": "404"
     }
   },
-  "timestamp": "2025-07-10T15:19:17.139Z"
+  "timestamp": "2025-07-10T18:05:36.523Z"
 }

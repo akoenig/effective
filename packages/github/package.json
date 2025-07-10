@@ -7,6 +7,8 @@
     "@akoenig/effect-http-recorder": "workspace:*",
     "@effect/cli": "0.66.11",
     "@effect/platform-node": "0.89.3",
+    "@effect/vitest": "0.23.12",
+    "vitest": "3.2.4",
     "tsx": "4.20.3"
   },
   "exports": {
