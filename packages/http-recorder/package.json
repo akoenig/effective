@@ -39,7 +39,7 @@
     "build": "tsc -b",
     "clean": "rm -rf dist .tsbuildinfo",
     "test": "vitest run",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc --noEmit"
   },
   "type": "module"
 }

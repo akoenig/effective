@@ -45,7 +45,7 @@
     "cli:clean": "tsx cli/main.ts clean",
     "cli:record": "tsx cli/main.ts record",
     "cli:test": "tsx cli/main.ts test",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc --noEmit"
   },
   "type": "module"
 }
