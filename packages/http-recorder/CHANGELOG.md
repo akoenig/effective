@@ -1,5 +1,11 @@
 # @akoenig/effect-http-recorder
 
+## 1.0.3
+
+### Patch Changes
+
+- acbbaa5: Makes sure that responses with an empty body are handled correctly.
+
 ## 1.0.2
 
 ### Patch Changes
