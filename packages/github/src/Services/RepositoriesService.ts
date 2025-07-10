@@ -6,9 +6,9 @@ import {
   RepositoryError,
 } from '../Domain/Errors/index.js'
 import {
+  type ListResponseType,
   Repository,
   RepositoryListOptions,
-  type ListResponseType,
 } from '../Domain/index.js'
 import { GitHubAuthService } from '../Infrastructure/Auth/GitHubAuthService.js'
 import { GitHubHttpClientService } from '../Infrastructure/Http/GitHubHttpClientService.js'

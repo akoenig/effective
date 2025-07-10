@@ -1,6 +1,6 @@
 import { Context, Effect, Layer, Match, Redacted } from 'effect'
-import type { AuthConfig } from '../../Domain/ValueObjects/AuthConfig.js'
 import { AuthError } from '../../Domain/Errors/AuthError.js'
+import type { AuthConfig } from '../../Domain/ValueObjects/AuthConfig.js'
 
 /**
  * GitHub authentication configuration service

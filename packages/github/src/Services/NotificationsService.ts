@@ -6,9 +6,9 @@ import {
   NotificationError,
 } from '../Domain/Errors/index.js'
 import {
+  type ListResponseType,
   Notification,
   type NotificationListOptions,
-  type ListResponseType,
 } from '../Domain/index.js'
 import { GitHubAuthService } from '../Infrastructure/Auth/GitHubAuthService.js'
 import { GitHubHttpClientService } from '../Infrastructure/Http/GitHubHttpClientService.js'
