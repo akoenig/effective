@@ -48,3 +48,5 @@ test-recordings/
 .direnv/
 
 /ai
+
+.turbo

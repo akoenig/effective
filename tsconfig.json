@@ -1,12 +1,6 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
-  },
-  "references": [
-    { "path": "./packages/http-recorder" },
-    { "path": "./packages/github" },
-    { "path": "./examples/github-sdk-example" }
-  ],
-  "files": []
+    "composite": false
+  }
 }

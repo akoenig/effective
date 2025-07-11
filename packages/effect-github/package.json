@@ -13,9 +13,18 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/mod.d.ts",
-      "import": "./dist/mod.js"
-    }
+      "import": {
+        "types": "./dist/mod.d.ts",
+        "@effective/source": "./src/mod.ts",
+        "default": "./dist/mod.js"
+      },
+      "require": {
+        "types": "./dist/mod.d.ts",
+        "@effective/source": "./src/mod.ts",
+        "default": "./dist/mod.js"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -36,15 +45,17 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/akoenig/effective.git",
-    "directory": "packages/github"
+    "directory": "packages/effect-github"
   },
   "scripts": {
-    "cli:build": "tsx cli/main.ts build",
+    "build": "pnpm cli:build",
     "clean": "rm -rf dist .tsbuildinfo",
+    "cli:build": "tsx cli/main.ts build",
     "cli": "tsx cli/main.ts",
     "cli:clean": "tsx cli/main.ts clean",
     "cli:record": "tsx cli/main.ts record",
-    "cli:test": "tsx cli/main.ts test"
+    "cli:test": "tsx cli/main.ts test",
+    "test": "vitest"
   },
   "type": "module"
 }

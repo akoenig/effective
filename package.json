@@ -8,6 +8,7 @@
     "@changesets/cli": "^2.29.5",
     "@types/node": "^22.16.2",
     "syncpack": "14.0.0-alpha.18",
+    "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
   "keywords": [
@@ -18,7 +19,7 @@
   "packageManager": "pnpm@10.12.4",
   "private": true,
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "turbo build",
     "changeset": "changeset",
     "changeset:publish": "changeset publish",
     "changeset:status": "changeset status",
