@@ -1,4 +1,5 @@
 import { Schema } from 'effect'
+import { GitHub } from '../../Infrastructure/Schemas/GitHubSchemas.js'
 import { User } from './User.js'
 
 /**
@@ -20,8 +21,8 @@ export const Repository = Schema.Struct({
   // Basic properties
   private: Schema.Boolean,
   fork: Schema.Boolean,
-  description: Schema.NullOr(Schema.String),
-  language: Schema.NullOr(Schema.String),
+  description: GitHub.nullable(Schema.String),
+  language: GitHub.nullable(Schema.String),
   archived: Schema.Boolean,
   disabled: Schema.Boolean,
   visibility: Schema.String,
@@ -43,10 +44,10 @@ export const Repository = Schema.Struct({
   svnUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('svn_url'),
   ),
-  mirrorUrl: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
+  mirrorUrl: Schema.propertySignature(GitHub.nullable(Schema.String)).pipe(
     Schema.fromKey('mirror_url'),
   ),
-  homepage: Schema.NullOr(Schema.String),
+  homepage: GitHub.nullable(Schema.String),
 
   // Features and settings
   hasIssues: Schema.propertySignature(Schema.Boolean).pipe(
@@ -94,19 +95,19 @@ export const Repository = Schema.Struct({
   ),
 
   // Timestamps
-  pushedAt: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
+  pushedAt: Schema.propertySignature(GitHub.nullableDate()).pipe(
     Schema.fromKey('pushed_at'),
   ),
-  createdAt: Schema.propertySignature(Schema.String).pipe(
+  createdAt: Schema.propertySignature(Schema.DateFromString).pipe(
     Schema.fromKey('created_at'),
   ),
-  updatedAt: Schema.propertySignature(Schema.String).pipe(
+  updatedAt: Schema.propertySignature(Schema.DateFromString).pipe(
     Schema.fromKey('updated_at'),
   ),
 
   // Optional fields that may appear in some contexts
-  license: Schema.optional(Schema.NullOr(Schema.Any)), // License can be null or a complex object
-  topics: Schema.optional(Schema.Array(Schema.String)),
+  license: GitHub.nullable(Schema.Any), // License can be null or a complex object
+  topics: GitHub.optionalArray(Schema.String),
   isTemplate: Schema.optionalWith(Schema.Boolean, {
     default: () => false,
   }).pipe(Schema.fromKey('is_template')),

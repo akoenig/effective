@@ -1,4 +1,5 @@
 import { Schema } from 'effect'
+import { GitHub } from '../../Infrastructure/Schemas/GitHubSchemas.js'
 
 /**
  * GitHub simple user schema with camelCase properties
@@ -17,7 +18,7 @@ export const User = Schema.Struct({
   avatarUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('avatar_url'),
   ),
-  gravatarId: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
+  gravatarId: Schema.propertySignature(GitHub.nullable(Schema.String)).pipe(
     Schema.fromKey('gravatar_id'),
   ),
 
@@ -61,9 +62,9 @@ export const User = Schema.Struct({
   ),
 
   // Optional fields that may appear in some contexts
-  name: Schema.optional(Schema.NullOr(Schema.String)),
-  email: Schema.optional(Schema.NullOr(Schema.String)),
-  starredAt: Schema.optionalWith(Schema.String, { exact: true }).pipe(
+  name: Schema.optional(GitHub.nullable(Schema.String)),
+  email: Schema.optional(GitHub.nullable(Schema.String)),
+  starredAt: Schema.optionalWith(Schema.DateFromString, { exact: true }).pipe(
     Schema.fromKey('starred_at'),
   ),
   userViewType: Schema.optionalWith(Schema.String, { exact: true }).pipe(

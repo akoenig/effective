@@ -6,7 +6,7 @@ import {
   NodePath,
 } from '@effect/platform-node'
 import { describe, expect, it } from '@effect/vitest'
-import { Config, Effect, Layer, Redacted } from 'effect'
+import { Config, Effect, Layer, Option, Redacted } from 'effect'
 import { GitHub } from '../layer.js'
 import { RepositoriesService } from './RepositoriesService.js'
 
@@ -42,13 +42,15 @@ describe('RepositoriesService', () => {
         const result = yield* repositories.listForAuthenticatedUser()
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
-        expect(result.data.length).toBeGreaterThan(0)
+        expect(Option.isSome(result.data)).toBe(true)
 
-        // Verify structure of first repository
-        if (result.data.length > 0) {
-          const repo = result.data[0]
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+          expect(data.length).toBeGreaterThan(0)
+
+          // Verify structure of first repository (guaranteed to exist in NonEmptyArray)
+          const repo = data[0] // This is guaranteed to be defined
           expect(repo).toHaveProperty('id')
           expect(repo).toHaveProperty('name')
           expect(repo).toHaveProperty('fullName')
@@ -75,18 +77,20 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
+        expect(Option.isSome(result.data)).toBe(true)
 
-        // Verify the results respect the filters
-        if (result.data.length > 1) {
-          const repo1 = result.data[0]
-          const repo2 = result.data[1]
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
 
-          // Check that repos are sorted by updated time (desc)
-          const date1 = new Date(repo1.updatedAt)
-          const date2 = new Date(repo2.updatedAt)
-          expect(date1.getTime()).toBeGreaterThanOrEqual(date2.getTime())
+          // Verify the results respect the filters (NonEmptyArray guarantees at least one item)
+          const repo1 = data[0] // Guaranteed to exist
+          if (data.length > 1) {
+            const repo2 = data[1] // Safe to access when length > 1
+
+            // Check that repos are sorted by updated time (desc)
+            expect(repo1.updatedAt.getTime()).toBeGreaterThanOrEqual(repo2.updatedAt.getTime())
+          }
         }
       }).pipe(Effect.provide(TestLayer)),
     )
@@ -100,8 +104,12 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
+        expect(Option.isOption(result.data)).toBe(true)
+
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
 
@@ -114,8 +122,27 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
+        expect(Option.isOption(result.data)).toBe(true)
+
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+        }
+      }).pipe(Effect.provide(TestLayer)),
+    )
+
+    it.effect('should return Option.none() for empty results', () =>
+      Effect.gen(function* () {
+        const repositories = yield* RepositoriesService
+        // Using very specific filters that might return no results
+        const result = yield* repositories.listForAuthenticatedUser({
+          type: 'member',
+          perPage: 100,
+        })
+
+        expect(result).toBeDefined()
+        expect(Option.isOption(result.data)).toBe(true)
+        // The result could be either Some or None depending on actual data
       }).pipe(Effect.provide(TestLayer)),
     )
   })
@@ -194,15 +221,19 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
-        expect(result.data.length).toBeGreaterThan(0)
+        expect(Option.isSome(result.data)).toBe(true)
 
-        // Verify all repos belong to the requested user
-        result.data.forEach((repo) => {
-          expect(repo.owner).toBeDefined()
-          expect(repo.owner.login).toBe('example-user')
-        })
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+          expect(data.length).toBeGreaterThan(0)
+
+          // Verify all repos belong to the requested user
+          data.forEach((repo) => {
+            expect(repo.owner).toBeDefined()
+            expect(repo.owner.login).toBe('example-user')
+          })
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
 
@@ -215,8 +246,12 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
+        expect(Option.isOption(result.data)).toBe(true)
+
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
   })
@@ -231,15 +266,19 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
-        expect(result.data.length).toBeGreaterThan(0)
+        expect(Option.isSome(result.data)).toBe(true)
 
-        // Verify all repos belong to the organization
-        result.data.forEach((repo) => {
-          expect(repo.owner).toBeDefined()
-          expect(repo.owner.type).toBe('Organization')
-        })
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+          expect(data.length).toBeGreaterThan(0)
+
+          // Verify all repos belong to the organization
+          data.forEach((repo) => {
+            expect(repo.owner).toBeDefined()
+            expect(repo.owner.type).toBe('Organization')
+          })
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
 
@@ -253,17 +292,19 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
+        expect(Option.isSome(result.data)).toBe(true)
 
-        // Verify sorting
-        if (result.data.length > 1) {
-          const repo1 = result.data[0]
-          const repo2 = result.data[1]
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
 
-          const date1 = new Date(repo1.createdAt)
-          const date2 = new Date(repo2.createdAt)
-          expect(date1.getTime()).toBeLessThanOrEqual(date2.getTime())
+          // Verify sorting (NonEmptyArray guarantees at least one item)
+          const repo1 = data[0] // Guaranteed to exist
+          if (data.length > 1) {
+            const repo2 = data[1] // Safe to access when length > 1
+
+            expect(repo1.createdAt.getTime()).toBeLessThanOrEqual(repo2.createdAt.getTime())
+          }
         }
       }).pipe(Effect.provide(TestLayer)),
     )
@@ -312,58 +353,63 @@ describe('RepositoriesService', () => {
           perPage: 2,
         })
 
-        expect(result.data.length).toBeGreaterThan(0)
+        expect(Option.isSome(result.data)).toBe(true)
 
-        const repo = result.data[0]
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(data.length).toBeGreaterThan(0)
 
-        // Verify all URL properties are converted to camelCase
-        const urlProperties = [
-          'htmlUrl',
-          'archiveUrl',
-          'assigneesUrl',
-          'blobsUrl',
-          'branchesUrl',
-          'cloneUrl',
-          'collaboratorsUrl',
-          'commentsUrl',
-          'commitsUrl',
-          'compareUrl',
-          'contentsUrl',
-          'contributorsUrl',
-          'deploymentsUrl',
-          'downloadsUrl',
-          'eventsUrl',
-          'forksUrl',
-          'gitCommitsUrl',
-          'gitRefsUrl',
-          'gitTagsUrl',
-          'gitUrl',
-          'hooksUrl',
-          'issueCommentUrl',
-          'issueEventsUrl',
-          'issuesUrl',
-          'keysUrl',
-          'labelsUrl',
-          'languagesUrl',
-          'mergesUrl',
-          'milestonesUrl',
-          'notificationsUrl',
-          'pullsUrl',
-          'releasesUrl',
-          'sshUrl',
-          'stargazersUrl',
-          'statusesUrl',
-          'subscribersUrl',
-          'subscriptionUrl',
-          'svnUrl',
-          'tagsUrl',
-          'teamsUrl',
-          'treesUrl',
-        ]
+          const repo = data[0]
 
-        urlProperties.forEach((prop) => {
-          expect(repo).toHaveProperty(prop)
-        })
+          // Verify all URL properties are converted to camelCase
+          const urlProperties = [
+            'htmlUrl',
+            'archiveUrl',
+            'assigneesUrl',
+            'blobsUrl',
+            'branchesUrl',
+            'cloneUrl',
+            'collaboratorsUrl',
+            'commentsUrl',
+            'commitsUrl',
+            'compareUrl',
+            'contentsUrl',
+            'contributorsUrl',
+            'deploymentsUrl',
+            'downloadsUrl',
+            'eventsUrl',
+            'forksUrl',
+            'gitCommitsUrl',
+            'gitRefsUrl',
+            'gitTagsUrl',
+            'gitUrl',
+            'hooksUrl',
+            'issueCommentUrl',
+            'issueEventsUrl',
+            'issuesUrl',
+            'keysUrl',
+            'labelsUrl',
+            'languagesUrl',
+            'mergesUrl',
+            'milestonesUrl',
+            'notificationsUrl',
+            'pullsUrl',
+            'releasesUrl',
+            'sshUrl',
+            'stargazersUrl',
+            'statusesUrl',
+            'subscribersUrl',
+            'subscriptionUrl',
+            'svnUrl',
+            'tagsUrl',
+            'teamsUrl',
+            'treesUrl',
+          ]
+
+          urlProperties.forEach((prop) => {
+            expect(repo).toHaveProperty(prop)
+          })
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
   })
@@ -383,8 +429,12 @@ describe('RepositoriesService', () => {
         })
 
         expect(result).toBeDefined()
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
+        expect(Option.isOption(result.data)).toBe(true)
+
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
   })

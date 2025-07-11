@@ -1,4 +1,4 @@
-import { Effect, type ParseResult, Schema } from 'effect'
+import { Array as EffectArray, Effect, Option, type ParseResult, Schema } from 'effect'
 import {
   ApiError,
   type AuthError,
@@ -58,7 +58,9 @@ export class NotificationsService extends Effect.Service<NotificationsService>()
           )(rawNotifications)
 
           return {
-            data: notifications,
+            data: EffectArray.isNonEmptyReadonlyArray(notifications) 
+              ? Option.some(notifications) 
+              : Option.none(),
           }
         })
 
