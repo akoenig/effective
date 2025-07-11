@@ -12,7 +12,7 @@ Effect is a powerful TypeScript library designed for building robust, maintainab
 
 | Package | Description | Status |
 |---------|-------------|--------|
-| [@akoenig/effect-http-recorder](./packages/http-recorder) | HTTP request recording and replay utilities for testing | ✅ Stable |
+| [@akoenig/effect-http-recorder](./packages/effect-http-recorder) | HTTP request recording and replay utilities for testing | ✅ Stable |
 | @akoenig/effect-github | GitHub API SDK built with Effect | 🚧 In Development |
 
 ## Development
