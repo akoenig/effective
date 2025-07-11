@@ -1,4 +1,5 @@
 import { Schema } from 'effect'
+import { GitHub } from '../../Infrastructure/Schemas/GitHubSchemas.js'
 import { User } from '../Entities/User.js'
 
 /**
@@ -191,13 +192,13 @@ export const MinimalRepository = Schema.Struct({
   hasDiscussions: Schema.optionalWith(Schema.Boolean, {
     default: () => false,
   }).pipe(Schema.fromKey('has_discussions')),
-  pushedAt: Schema.optionalWith(Schema.NullOr(Schema.String), {
+  pushedAt: Schema.optionalWith(GitHub.nullableDate(), {
     exact: true,
   }).pipe(Schema.fromKey('pushed_at')),
-  createdAt: Schema.optionalWith(Schema.String, { exact: true }).pipe(
+  createdAt: Schema.optionalWith(Schema.DateFromString, { exact: true }).pipe(
     Schema.fromKey('created_at'),
   ),
-  updatedAt: Schema.optionalWith(Schema.String, { exact: true }).pipe(
+  updatedAt: Schema.optionalWith(Schema.DateFromString, { exact: true }).pipe(
     Schema.fromKey('updated_at'),
   ),
   license: Schema.optional(Schema.NullOr(Schema.Any)), // License can be null or a complex object

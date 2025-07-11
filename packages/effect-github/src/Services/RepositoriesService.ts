@@ -1,4 +1,4 @@
-import { Effect, type ParseResult, Schema } from 'effect'
+import { Array as EffectArray, Effect, Option, type ParseResult, Schema } from 'effect'
 import {
   ApiError,
   type AuthError,
@@ -72,7 +72,9 @@ export class RepositoriesService extends Effect.Service<RepositoriesService>()(
           )(rawRepositories)
 
           return {
-            data: repositories,
+            data: EffectArray.isNonEmptyReadonlyArray(repositories) 
+              ? Option.some(repositories) 
+              : Option.none(),
           }
         })
 
@@ -141,7 +143,9 @@ export class RepositoriesService extends Effect.Service<RepositoriesService>()(
           )(rawRepositories)
 
           return {
-            data: repositories,
+            data: EffectArray.isNonEmptyReadonlyArray(repositories) 
+              ? Option.some(repositories) 
+              : Option.none(),
           }
         })
 
@@ -179,7 +183,9 @@ export class RepositoriesService extends Effect.Service<RepositoriesService>()(
           )(rawRepositories)
 
           return {
-            data: repositories,
+            data: EffectArray.isNonEmptyReadonlyArray(repositories) 
+              ? Option.some(repositories) 
+              : Option.none(),
           }
         })
 
