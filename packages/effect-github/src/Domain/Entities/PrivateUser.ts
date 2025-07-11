@@ -33,10 +33,10 @@ export const PrivateUser = Schema.Struct({
   following: Schema.Number,
 
   // Timestamps (required for private user)
-  createdAt: Schema.propertySignature(Schema.String).pipe(
+  createdAt: Schema.propertySignature(Schema.DateFromString).pipe(
     Schema.fromKey('created_at'),
   ),
-  updatedAt: Schema.propertySignature(Schema.String).pipe(
+  updatedAt: Schema.propertySignature(Schema.DateFromString).pipe(
     Schema.fromKey('updated_at'),
   ),
 

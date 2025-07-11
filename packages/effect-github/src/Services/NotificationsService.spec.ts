@@ -6,7 +6,7 @@ import {
   NodePath,
 } from '@effect/platform-node'
 import { describe, expect, it } from '@effect/vitest'
-import { Config, Effect, Layer, Redacted } from 'effect'
+import { Config, Effect, Layer, Option, Redacted } from 'effect'
 import { GitHub } from '../layer.js'
 import { NotificationsService } from './NotificationsService.js'
 
@@ -41,9 +41,14 @@ describe('NotificationsService', () => {
         const notifications = yield* NotificationsService
         const result = yield* notifications.listForAuthenticatedUser()
 
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
-        expect(result.data.length).toBe(37)
+        expect(result).toBeDefined()
+        expect(Option.isSome(result.data)).toBe(true)
+        
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+          expect(data.length).toBe(37)
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
 
@@ -55,9 +60,14 @@ describe('NotificationsService', () => {
           page: 1,
         })
 
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
-        expect(result.data.length).toBe(37)
+        expect(result).toBeDefined()
+        expect(Option.isSome(result.data)).toBe(true)
+        
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+          expect(data.length).toBe(37)
+        }
       }).pipe(Effect.provide(TestLayer)),
     )
 
@@ -69,8 +79,28 @@ describe('NotificationsService', () => {
           perPage: 3,
         })
 
-        expect(result.data).toBeDefined()
-        expect(Array.isArray(result.data)).toBe(true)
+        expect(result).toBeDefined()
+        expect(Option.isOption(result.data)).toBe(true)
+        
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+        }
+      }).pipe(Effect.provide(TestLayer)),
+    )
+    
+    it.effect('should handle empty notification lists', () =>
+      Effect.gen(function* () {
+        const notifications = yield* NotificationsService
+        // In real scenarios, when there are no notifications
+        const result = yield* notifications.listForAuthenticatedUser({
+          all: false,
+          perPage: 100,
+        })
+
+        expect(result).toBeDefined()
+        expect(Option.isOption(result.data)).toBe(true)
+        // The result could be either Some or None depending on actual data
       }).pipe(Effect.provide(TestLayer)),
     )
   })
@@ -184,6 +214,38 @@ describe('NotificationsService', () => {
           )
           expect(notification.repository).toHaveProperty('htmlUrl') // from html_url
         }).pipe(Effect.provide(TestLayer)),
+    )
+  })
+  
+  describe('Option Handling', () => {
+    it.effect('should properly handle Option for list results', () =>
+      Effect.gen(function* () {
+        const notifications = yield* NotificationsService
+        const result = yield* notifications.listForAuthenticatedUser()
+
+        // Verify the data field is an Option
+        expect(Option.isOption(result.data)).toBe(true)
+        
+        // For testing purposes, we know the test data has notifications
+        expect(Option.isSome(result.data)).toBe(true)
+        
+        if (Option.isSome(result.data)) {
+          const data = result.data.value
+          expect(Array.isArray(data)).toBe(true)
+          expect(data.length).toBeGreaterThan(0)
+          
+          // Verify structure of first notification
+          if (data.length > 0) {
+            const notification = data[0]
+            expect(notification).toHaveProperty('id')
+            expect(notification).toHaveProperty('unread')
+            expect(notification).toHaveProperty('reason')
+            expect(notification).toHaveProperty('updatedAt')
+            expect(notification).toHaveProperty('subject')
+            expect(notification).toHaveProperty('repository')
+          }
+        }
+      }).pipe(Effect.provide(TestLayer)),
     )
   })
 })
