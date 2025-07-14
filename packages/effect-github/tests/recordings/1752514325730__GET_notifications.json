@@ -1,8 +1,8 @@
 {
-  "id": "1752170733856__DELETE_notifications-threads-17507535488",
+  "id": "1752514325730__GET_notifications",
   "request": {
-    "method": "DELETE",
-    "url": "https://api.github.com/notifications/threads/17507535488",
+    "method": "GET",
+    "url": "https://api.github.com/notifications",
     "headers": {
       "user-agent": "***REDACTED***",
       "accept": "***REDACTED***",
@@ -11,9 +11,15 @@
     }
   },
   "response": {
-    "status": 204,
+    "status": 200,
     "headers": {
       "date": "***REDACTED***",
+      "content-type": "***REDACTED***",
+      "content-length": "***REDACTED***",
+      "cache-control": "***REDACTED***",
+      "vary": "***REDACTED***",
+      "etag": "***REDACTED***",
+      "x-poll-interval": "***REDACTED***",
       "x-oauth-scopes": "***REDACTED***",
       "x-accepted-oauth-scopes": "***REDACTED***",
       "x-oauth-client-id": "***REDACTED***",
@@ -32,12 +38,11 @@
       "x-xss-protection": "***REDACTED***",
       "referrer-policy": "***REDACTED***",
       "content-security-policy": "***REDACTED***",
-      "vary": "***REDACTED***",
       "server": "***REDACTED***",
       "x-github-request-id": "***REDACTED***",
       "connection": "***REDACTED***"
     },
-    "body": null
+    "body": []
   },
-  "timestamp": "2025-07-10T18:05:33.856Z"
+  "timestamp": "2025-07-14T17:32:05.730Z"
 }

@@ -12,6 +12,7 @@ import {
 } from '../Domain/index.js'
 import { GitHubAuthService } from '../Infrastructure/Auth/GitHubAuthService.js'
 import { GitHubHttpClientService } from '../Infrastructure/Http/GitHubHttpClientService.js'
+import { normalizeGitHubNulls } from '../Infrastructure/Schemas/GitHubSchemas.js'
 
 type RepositoryServiceError =
   | RepositoryError
@@ -66,15 +67,14 @@ export class RepositoriesService extends Effect.Service<RepositoriesService>()(
               }),
             )
 
-          // Decode snake_case response to camelCase
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepositories)
           const repositories = yield* Schema.decodeUnknown(
             Schema.Array(Repository),
-          )(rawRepositories)
+          )(normalizedData)
 
           return {
-            data: EffectArray.isNonEmptyReadonlyArray(repositories) 
-              ? Option.some(repositories) 
-              : Option.none(),
+            data: Option.some(repositories),
           }
         })
 
@@ -105,8 +105,9 @@ export class RepositoriesService extends Effect.Service<RepositoriesService>()(
               }),
             )
 
-          // Decode snake_case response to camelCase
-          return yield* Schema.decodeUnknown(Repository)(rawRepository)
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepository)
+          return yield* Schema.decodeUnknown(Repository)(normalizedData)
         })
 
       const listForUser = (
@@ -137,15 +138,14 @@ export class RepositoriesService extends Effect.Service<RepositoriesService>()(
             },
           )
 
-          // Decode snake_case response to camelCase
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepositories)
           const repositories = yield* Schema.decodeUnknown(
             Schema.Array(Repository),
-          )(rawRepositories)
+          )(normalizedData)
 
           return {
-            data: EffectArray.isNonEmptyReadonlyArray(repositories) 
-              ? Option.some(repositories) 
-              : Option.none(),
+            data: Option.some(repositories),
           }
         })
 
@@ -177,15 +177,14 @@ export class RepositoriesService extends Effect.Service<RepositoriesService>()(
             },
           )
 
-          // Decode snake_case response to camelCase
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepositories)
           const repositories = yield* Schema.decodeUnknown(
             Schema.Array(Repository),
-          )(rawRepositories)
+          )(normalizedData)
 
           return {
-            data: EffectArray.isNonEmptyReadonlyArray(repositories) 
-              ? Option.some(repositories) 
-              : Option.none(),
+            data: Option.some(repositories),
           }
         })
 

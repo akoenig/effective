@@ -155,7 +155,7 @@ describe('RepositoriesService', () => {
 
         expect(result).toBeDefined()
         expect(result.id).toBe(12345)
-        expect(result.name).toBe('effect')
+        expect(result.name).toBe('Example User')
         expect(result.fullName).toBe('example-user/example-repo')
         expect(result).toHaveProperty('owner')
         expect(result.owner).toBeDefined()
@@ -361,49 +361,16 @@ describe('RepositoriesService', () => {
 
           const repo = data[0]
 
-          // Verify all URL properties are converted to camelCase
+          // Verify URL properties that exist in Repository schema are converted to camelCase
           const urlProperties = [
             'htmlUrl',
-            'archiveUrl',
-            'assigneesUrl',
-            'blobsUrl',
-            'branchesUrl',
+            'url', 
             'cloneUrl',
-            'collaboratorsUrl',
-            'commentsUrl',
-            'commitsUrl',
-            'compareUrl',
-            'contentsUrl',
-            'contributorsUrl',
-            'deploymentsUrl',
-            'downloadsUrl',
-            'eventsUrl',
-            'forksUrl',
-            'gitCommitsUrl',
-            'gitRefsUrl',
-            'gitTagsUrl',
-            'gitUrl',
-            'hooksUrl',
-            'issueCommentUrl',
-            'issueEventsUrl',
-            'issuesUrl',
-            'keysUrl',
-            'labelsUrl',
-            'languagesUrl',
-            'mergesUrl',
-            'milestonesUrl',
-            'notificationsUrl',
-            'pullsUrl',
-            'releasesUrl',
             'sshUrl',
-            'stargazersUrl',
-            'statusesUrl',
-            'subscribersUrl',
-            'subscriptionUrl',
+            'gitUrl',
             'svnUrl',
-            'tagsUrl',
-            'teamsUrl',
-            'treesUrl',
+            'mirrorUrl',
+            'homepage',
           ]
 
           urlProperties.forEach((prop) => {

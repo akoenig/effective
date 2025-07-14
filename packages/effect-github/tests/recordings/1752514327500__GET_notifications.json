@@ -1,24 +1,25 @@
 {
-  "id": "1752170734655__PATCH_notifications-threads-17507535488",
+  "id": "1752514327500__GET_notifications",
   "request": {
-    "method": "PATCH",
-    "url": "https://api.github.com/notifications/threads/17507535488",
+    "method": "GET",
+    "url": "https://api.github.com/notifications?all=false&perPage=100",
     "headers": {
       "user-agent": "***REDACTED***",
       "accept": "***REDACTED***",
       "x-github-api-version": "***REDACTED***",
-      "authorization": "***REDACTED***",
-      "content-type": "***REDACTED***",
-      "content-length": "***REDACTED***"
-    },
-    "body": "{}"
+      "authorization": "***REDACTED***"
+    }
   },
   "response": {
-    "status": 205,
+    "status": 200,
     "headers": {
       "date": "***REDACTED***",
       "content-type": "***REDACTED***",
       "content-length": "***REDACTED***",
+      "cache-control": "***REDACTED***",
+      "vary": "***REDACTED***",
+      "etag": "***REDACTED***",
+      "x-poll-interval": "***REDACTED***",
       "x-oauth-scopes": "***REDACTED***",
       "x-accepted-oauth-scopes": "***REDACTED***",
       "x-oauth-client-id": "***REDACTED***",
@@ -37,12 +38,11 @@
       "x-xss-protection": "***REDACTED***",
       "referrer-policy": "***REDACTED***",
       "content-security-policy": "***REDACTED***",
-      "vary": "***REDACTED***",
       "server": "***REDACTED***",
       "x-github-request-id": "***REDACTED***",
       "connection": "***REDACTED***"
     },
-    "body": null
+    "body": []
   },
-  "timestamp": "2025-07-10T18:05:34.655Z"
+  "timestamp": "2025-07-14T17:32:07.500Z"
 }

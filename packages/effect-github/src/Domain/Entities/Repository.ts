@@ -1,5 +1,6 @@
 import { Schema } from 'effect'
 import { GitHub } from '../../Infrastructure/Schemas/GitHubSchemas.js'
+import { License } from '../ValueObjects/License.js'
 import { User } from './User.js'
 
 /**
@@ -105,8 +106,43 @@ export const Repository = Schema.Struct({
     Schema.fromKey('updated_at'),
   ),
 
+  // Merge configuration (commonly used)
+  allowRebaseMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => true,
+  }).pipe(Schema.fromKey('allow_rebase_merge')),
+  allowSquashMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => true,
+  }).pipe(Schema.fromKey('allow_squash_merge')),
+  allowMergeCommit: Schema.optionalWith(Schema.Boolean, {
+    default: () => true,
+  }).pipe(Schema.fromKey('allow_merge_commit')),
+  allowAutoMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('allow_auto_merge')),
+  deleteBranchOnMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('delete_branch_on_merge')),
+  allowUpdateBranch: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('allow_update_branch')),
+  allowForking: Schema.optional(Schema.Boolean).pipe(
+    Schema.fromKey('allow_forking'),
+  ),
+  webCommitSignoffRequired: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('web_commit_signoff_required')),
+
+  // Repository permissions (commonly accessed)
+  permissions: Schema.optional(Schema.Struct({
+    admin: Schema.Boolean,
+    maintain: Schema.Boolean,
+    push: Schema.Boolean,
+    triage: Schema.Boolean,
+    pull: Schema.Boolean,
+  })),
+
   // Optional fields that may appear in some contexts
-  license: GitHub.nullable(Schema.Any), // License can be null or a complex object
+  license: GitHub.nullable(License),
   topics: GitHub.optionalArray(Schema.String),
   isTemplate: Schema.optionalWith(Schema.Boolean, {
     default: () => false,

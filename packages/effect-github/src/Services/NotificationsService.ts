@@ -12,6 +12,7 @@ import {
 } from '../Domain/index.js'
 import { GitHubAuthService } from '../Infrastructure/Auth/GitHubAuthService.js'
 import { GitHubHttpClientService } from '../Infrastructure/Http/GitHubHttpClientService.js'
+import { normalizeGitHubNulls } from '../Infrastructure/Schemas/GitHubSchemas.js'
 
 type NotificationServiceError =
   | NotificationError
@@ -52,15 +53,14 @@ export class NotificationsService extends Effect.Service<NotificationsService>()
             },
           )
 
-          // Decode snake_case response to camelCase
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawNotifications)
           const notifications = yield* Schema.decodeUnknown(
             Schema.Array(Notification),
-          )(rawNotifications)
+          )(normalizedData)
 
           return {
-            data: EffectArray.isNonEmptyReadonlyArray(notifications) 
-              ? Option.some(notifications) 
-              : Option.none(),
+            data: Option.some(notifications),
           }
         })
 
@@ -137,8 +137,9 @@ export class NotificationsService extends Effect.Service<NotificationsService>()
               }),
             )
 
-          // Decode snake_case response to camelCase
-          return yield* Schema.decodeUnknown(Notification)(rawNotification)
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawNotification)
+          return yield* Schema.decodeUnknown(Notification)(normalizedData)
         })
 
       const markThreadAsRead = (

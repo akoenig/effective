@@ -1,6 +1,7 @@
 import { Schema } from 'effect'
 import { GitHub } from '../../Infrastructure/Schemas/GitHubSchemas.js'
 import { User } from '../Entities/User.js'
+import { License } from './License.js'
 
 /**
  * GitHub minimal repository schema with camelCase properties
@@ -22,7 +23,7 @@ export const MinimalRepository = Schema.Struct({
   // Basic properties
   private: Schema.Boolean,
   fork: Schema.Boolean,
-  description: Schema.NullOr(Schema.String),
+  description: GitHub.nullableString(),
   archived: Schema.optional(Schema.Boolean),
   disabled: Schema.optional(Schema.Boolean),
 
@@ -146,17 +147,17 @@ export const MinimalRepository = Schema.Struct({
   cloneUrl: Schema.optionalWith(Schema.String, { exact: true }).pipe(
     Schema.fromKey('clone_url'),
   ),
-  mirrorUrl: Schema.optionalWith(Schema.NullOr(Schema.String), {
-    exact: true,
-  }).pipe(Schema.fromKey('mirror_url')),
+  mirrorUrl: Schema.propertySignature(GitHub.nullable(Schema.String)).pipe(
+    Schema.fromKey('mirror_url'),
+  ),
   sshUrl: Schema.optionalWith(Schema.String, { exact: true }).pipe(
     Schema.fromKey('ssh_url'),
   ),
   svnUrl: Schema.optionalWith(Schema.String, { exact: true }).pipe(
     Schema.fromKey('svn_url'),
   ),
-  homepage: Schema.optional(Schema.NullOr(Schema.String)),
-  language: Schema.optional(Schema.NullOr(Schema.String)),
+  homepage: Schema.optional(GitHub.nullableString()),
+  language: Schema.optional(GitHub.nullableString()),
   forksCount: Schema.optionalWith(Schema.Number, { exact: true }).pipe(
     Schema.fromKey('forks_count'),
   ),
@@ -201,7 +202,7 @@ export const MinimalRepository = Schema.Struct({
   updatedAt: Schema.optionalWith(Schema.DateFromString, { exact: true }).pipe(
     Schema.fromKey('updated_at'),
   ),
-  license: Schema.optional(Schema.NullOr(Schema.Any)), // License can be null or a complex object
+  license: Schema.optional(GitHub.nullable(License)),
   forks: Schema.optional(Schema.Number),
   openIssues: Schema.optionalWith(Schema.Number, { exact: true }).pipe(
     Schema.fromKey('open_issues'),

@@ -445,7 +445,12 @@ const createRecordingLayer = (token: string) => {
  */
 const recordNotificationsMethods = Effect.gen(function* () {
   const notifications = yield* NotificationsService
-  const results = []
+  const results: Array<{
+    method: string
+    params: string
+    status: string
+    error: string | null
+  }> = []
 
   yield* Console.log('📝 Recording NotificationsService methods...')
 
@@ -522,7 +527,32 @@ const recordNotificationsMethods = Effect.gen(function* () {
     )
   results.push(listResult3)
 
-  // 4. Get thread (will likely fail with 404, but that's OK for recording)
+  // 4. List notifications with specific parameters for empty list test
+  yield* Console.log('  → listForAuthenticatedUser (empty list test params)')
+  const listResult4 = yield* notifications
+    .listForAuthenticatedUser({ all: false, perPage: 100 })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForAuthenticatedUser',
+        params: 'empty-test',
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForAuthenticatedUser',
+            params: 'empty-test',
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(listResult4)
+
+  // 5. Get thread (will likely fail with 404, but that's OK for recording)
   yield* Console.log('  → getThread (sample thread ID)')
   const threadResult = yield* notifications.getThread('17507535488').pipe(
     Effect.map(() => ({
@@ -545,7 +575,7 @@ const recordNotificationsMethods = Effect.gen(function* () {
   )
   results.push(threadResult)
 
-  // 5. Mark notification as read
+  // 6. Mark notification as read
   yield* Console.log('  → markAsRead')
   const markAsReadResult = yield* notifications.markAsRead('17507535488').pipe(
     Effect.map(() => ({
@@ -568,7 +598,7 @@ const recordNotificationsMethods = Effect.gen(function* () {
   )
   results.push(markAsReadResult)
 
-  // 6. Mark all notifications as read (will likely fail with 404, but that's OK for recording)
+  // 7. Mark all notifications as read (will likely fail with 404, but that's OK for recording)
   yield* Console.log('  → markAllAsRead')
   const markAllAsReadResult = yield* notifications.markAllAsRead().pipe(
     Effect.map(() => ({
@@ -591,7 +621,7 @@ const recordNotificationsMethods = Effect.gen(function* () {
   )
   results.push(markAllAsReadResult)
 
-  // 7. Mark thread as read
+  // 8. Mark thread as read
   yield* Console.log('  → markThreadAsRead')
   const markThreadAsReadResult = yield* notifications
     .markThreadAsRead('17507535488')
@@ -624,7 +654,12 @@ const recordNotificationsMethods = Effect.gen(function* () {
  */
 const recordRepositoriesMethods = Effect.gen(function* () {
   const repositories = yield* RepositoriesService
-  const results = []
+  const results: Array<{
+    method: string
+    params: string
+    status: string
+    error: string | null
+  }> = []
 
   yield* Console.log('\n📝 Recording RepositoriesService methods...')
 
@@ -782,6 +817,191 @@ const recordRepositoriesMethods = Effect.gen(function* () {
       ),
     )
   results.push(orgListResult)
+
+  // 7. Additional repository recordings for missing test cases
+  yield* Console.log('  → listForAuthenticatedUser (public type filter)')
+  const authListResult3 = yield* repositories
+    .listForAuthenticatedUser({ type: 'public', perPage: 10 })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForAuthenticatedUser',
+        params: 'public-filter',
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForAuthenticatedUser',
+            params: 'public-filter',
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(authListResult3)
+
+  // 8. Member type filter
+  yield* Console.log('  → listForAuthenticatedUser (member type filter)')
+  const authListResult4 = yield* repositories
+    .listForAuthenticatedUser({ type: 'member', perPage: 5 })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForAuthenticatedUser',
+        params: 'member-filter',
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForAuthenticatedUser',
+            params: 'member-filter',
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(authListResult4)
+
+  // 9. Member type filter with larger page size for empty results test
+  yield* Console.log('  → listForAuthenticatedUser (member type empty test)')
+  const authListResult5 = yield* repositories
+    .listForAuthenticatedUser({ type: 'member', perPage: 100 })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForAuthenticatedUser',
+        params: 'member-empty',
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForAuthenticatedUser',
+            params: 'member-empty',
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(authListResult5)
+
+  // 10. User repos with type filter
+  yield* Console.log(`  → listForUser (${TEST_DATA.user.username} with owner type)`)
+  const userListResult2 = yield* repositories
+    .listForUser(TEST_DATA.user.username, { type: 'owner', perPage: 10 })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForUser',
+        params: `${TEST_DATA.user.username}-owner`,
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForUser',
+            params: `${TEST_DATA.user.username}-owner`,
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(userListResult2)
+
+  // 11. Org repos with sort options
+  yield* Console.log(`  → listForOrg (${TEST_DATA.organization.name} with sort)`)
+  const orgListResult2 = yield* repositories
+    .listForOrg(TEST_DATA.organization.name, { 
+      sort: 'created', 
+      direction: 'asc', 
+      perPage: 5 
+    })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForOrg',
+        params: `${TEST_DATA.organization.name}-sorted`,
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForOrg',
+            params: `${TEST_DATA.organization.name}-sorted`,
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(orgListResult2)
+
+  // 12. Small page size for complex structure test
+  yield* Console.log('  → listForAuthenticatedUser (small page for complex test)')
+  const authListResult6 = yield* repositories
+    .listForAuthenticatedUser({ perPage: 2 })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForAuthenticatedUser',
+        params: 'complex-test',
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForAuthenticatedUser',
+            params: 'complex-test',
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(authListResult6)
+
+  // 13. Complex options encoding test
+  yield* Console.log('  → listForAuthenticatedUser (complex options encoding)')
+  const authListResult7 = yield* repositories
+    .listForAuthenticatedUser({ 
+      type: 'owner', 
+      sort: 'updated', 
+      direction: 'desc', 
+      perPage: 5, 
+      page: 2 
+    })
+    .pipe(
+      Effect.map(() => ({
+        method: 'listForAuthenticatedUser',
+        params: 'options-encoding',
+        status: 'success',
+        error: null,
+      })),
+      Effect.catchAll((error) =>
+        Effect.gen(function* () {
+          yield* Console.log(`    ❌ Error: ${error}`)
+          return {
+            method: 'listForAuthenticatedUser',
+            params: 'options-encoding',
+            status: 'failed',
+            error: String(error),
+          }
+        }),
+      ),
+    )
+  results.push(authListResult7)
 
   return results
 })
