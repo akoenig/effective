@@ -8,9 +8,9 @@ import {
 import { describe, expect, it } from '@effect/vitest'
 import { Config, Effect, Layer, Option, Redacted } from 'effect'
 import { GitHub } from '../layer.js'
-import { RepositoriesService } from './RepositoriesService.js'
+import { GitHubRepositories } from './GitHubRepositories.js'
 
-describe('RepositoriesService', () => {
+describe('GitHubRepositories', () => {
   const RECORDINGS_PATH = './tests/recordings'
   const TEST_TOKEN = 'test-token'
 
@@ -38,7 +38,7 @@ describe('RepositoriesService', () => {
   describe('listForAuthenticatedUser', () => {
     it.effect('should list repositories without options', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForAuthenticatedUser()
 
         expect(result).toBeDefined()
@@ -68,7 +68,7 @@ describe('RepositoriesService', () => {
 
     it.effect('should list repositories with filters', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForAuthenticatedUser({
           type: 'owner',
           sort: 'updated',
@@ -89,7 +89,9 @@ describe('RepositoriesService', () => {
             const repo2 = data[1] // Safe to access when length > 1
 
             // Check that repos are sorted by updated time (desc)
-            expect(repo1.updatedAt.getTime()).toBeGreaterThanOrEqual(repo2.updatedAt.getTime())
+            expect(repo1.updatedAt.getTime()).toBeGreaterThanOrEqual(
+              repo2.updatedAt.getTime(),
+            )
           }
         }
       }).pipe(Effect.provide(TestLayer)),
@@ -97,7 +99,7 @@ describe('RepositoriesService', () => {
 
     it.effect('should handle type filter for public repositories', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForAuthenticatedUser({
           type: 'public',
           perPage: 10,
@@ -115,7 +117,7 @@ describe('RepositoriesService', () => {
 
     it.effect('should handle member type filter', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForAuthenticatedUser({
           type: 'member',
           perPage: 5,
@@ -133,7 +135,7 @@ describe('RepositoriesService', () => {
 
     it.effect('should return Option.none() for empty results', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         // Using very specific filters that might return no results
         const result = yield* repositories.listForAuthenticatedUser({
           type: 'member',
@@ -150,7 +152,7 @@ describe('RepositoriesService', () => {
   describe('get', () => {
     it.effect('should get specific repository successfully', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.get('effect-ts', 'effect')
 
         expect(result).toBeDefined()
@@ -184,7 +186,7 @@ describe('RepositoriesService', () => {
       'should handle non-existent repository with RepositoryError',
       () =>
         Effect.gen(function* () {
-          const repositories = yield* RepositoriesService
+          const repositories = yield* GitHubRepositories
           const result = yield* Effect.either(
             repositories.get(
               'non-existent-owner-12345',
@@ -214,7 +216,7 @@ describe('RepositoriesService', () => {
   describe('listForUser', () => {
     it.effect('should list repositories for a specific user', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForUser('gcanti', {
           perPage: 5,
           sort: 'updated',
@@ -239,7 +241,7 @@ describe('RepositoriesService', () => {
 
     it.effect('should handle type filter for user repositories', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForUser('gcanti', {
           type: 'owner',
           perPage: 10,
@@ -259,7 +261,7 @@ describe('RepositoriesService', () => {
   describe('listForOrg', () => {
     it.effect('should list repositories for an organization', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForOrg('effect-ts', {
           perPage: 5,
           type: 'public',
@@ -284,7 +286,7 @@ describe('RepositoriesService', () => {
 
     it.effect('should handle sort options for organization repositories', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForOrg('effect-ts', {
           sort: 'created',
           direction: 'asc',
@@ -303,7 +305,9 @@ describe('RepositoriesService', () => {
           if (data.length > 1) {
             const repo2 = data[1] // Safe to access when length > 1
 
-            expect(repo1.createdAt.getTime()).toBeLessThanOrEqual(repo2.createdAt.getTime())
+            expect(repo1.createdAt.getTime()).toBeLessThanOrEqual(
+              repo2.createdAt.getTime(),
+            )
           }
         }
       }).pipe(Effect.provide(TestLayer)),
@@ -312,15 +316,15 @@ describe('RepositoriesService', () => {
 
   describe('Service Layer', () => {
     it('should provide default layer', () => {
-      expect(RepositoriesService.Default).toBeDefined()
-      expect(Layer.isLayer(RepositoriesService.Default)).toBe(true)
+      expect(GitHubRepositories.Default).toBeDefined()
+      expect(Layer.isLayer(GitHubRepositories.Default)).toBe(true)
     })
   })
 
   describe('Response Parsing', () => {
     it.effect('should properly parse snake_case to camelCase', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const repo = yield* repositories.get('effect-ts', 'effect')
 
         // Verify camelCase conversion
@@ -348,7 +352,7 @@ describe('RepositoriesService', () => {
 
     it.effect('should parse complex nested structures in list responses', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
         const result = yield* repositories.listForAuthenticatedUser({
           perPage: 2,
         })
@@ -364,7 +368,7 @@ describe('RepositoriesService', () => {
           // Verify URL properties that exist in Repository schema are converted to camelCase
           const urlProperties = [
             'htmlUrl',
-            'url', 
+            'url',
             'cloneUrl',
             'sshUrl',
             'gitUrl',
@@ -384,7 +388,7 @@ describe('RepositoriesService', () => {
   describe('Options Encoding', () => {
     it.effect('should properly encode camelCase options to snake_case', () =>
       Effect.gen(function* () {
-        const repositories = yield* RepositoriesService
+        const repositories = yield* GitHubRepositories
 
         // Test various option combinations
         const result = yield* repositories.listForAuthenticatedUser({

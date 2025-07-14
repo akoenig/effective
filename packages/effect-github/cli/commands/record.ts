@@ -16,8 +16,8 @@ import { FileSystem } from '@effect/platform'
 import { NodeContext } from '@effect/platform-node'
 import { Config, Console, Effect, Layer, Option, Redacted } from 'effect'
 import { GitHub } from '../../src/layer.js'
-import { NotificationsService } from '../../src/Services/NotificationsService.js'
-import { RepositoriesService } from '../../src/Services/RepositoriesService.js'
+import { GitHubNotifications } from '../../src/Services/GitHubNotifications.js'
+import { GitHubRepositories } from '../../src/Services/GitHubRepositories.js'
 
 // Configuration
 const RECORDINGS_PATH = './tests/recordings'
@@ -444,7 +444,7 @@ const createRecordingLayer = (token: string) => {
  * Record NotificationsService methods
  */
 const recordNotificationsMethods = Effect.gen(function* () {
-  const notifications = yield* NotificationsService
+  const notifications = yield* GitHubNotifications
   const results: Array<{
     method: string
     params: string
@@ -653,7 +653,7 @@ const recordNotificationsMethods = Effect.gen(function* () {
  * Record RepositoriesService methods
  */
 const recordRepositoriesMethods = Effect.gen(function* () {
-  const repositories = yield* RepositoriesService
+  const repositories = yield* GitHubRepositories
   const results: Array<{
     method: string
     params: string
@@ -894,7 +894,9 @@ const recordRepositoriesMethods = Effect.gen(function* () {
   results.push(authListResult5)
 
   // 10. User repos with type filter
-  yield* Console.log(`  → listForUser (${TEST_DATA.user.username} with owner type)`)
+  yield* Console.log(
+    `  → listForUser (${TEST_DATA.user.username} with owner type)`,
+  )
   const userListResult2 = yield* repositories
     .listForUser(TEST_DATA.user.username, { type: 'owner', perPage: 10 })
     .pipe(
@@ -919,12 +921,14 @@ const recordRepositoriesMethods = Effect.gen(function* () {
   results.push(userListResult2)
 
   // 11. Org repos with sort options
-  yield* Console.log(`  → listForOrg (${TEST_DATA.organization.name} with sort)`)
+  yield* Console.log(
+    `  → listForOrg (${TEST_DATA.organization.name} with sort)`,
+  )
   const orgListResult2 = yield* repositories
-    .listForOrg(TEST_DATA.organization.name, { 
-      sort: 'created', 
-      direction: 'asc', 
-      perPage: 5 
+    .listForOrg(TEST_DATA.organization.name, {
+      sort: 'created',
+      direction: 'asc',
+      perPage: 5,
     })
     .pipe(
       Effect.map(() => ({
@@ -948,7 +952,9 @@ const recordRepositoriesMethods = Effect.gen(function* () {
   results.push(orgListResult2)
 
   // 12. Small page size for complex structure test
-  yield* Console.log('  → listForAuthenticatedUser (small page for complex test)')
+  yield* Console.log(
+    '  → listForAuthenticatedUser (small page for complex test)',
+  )
   const authListResult6 = yield* repositories
     .listForAuthenticatedUser({ perPage: 2 })
     .pipe(
@@ -975,12 +981,12 @@ const recordRepositoriesMethods = Effect.gen(function* () {
   // 13. Complex options encoding test
   yield* Console.log('  → listForAuthenticatedUser (complex options encoding)')
   const authListResult7 = yield* repositories
-    .listForAuthenticatedUser({ 
-      type: 'owner', 
-      sort: 'updated', 
-      direction: 'desc', 
-      perPage: 5, 
-      page: 2 
+    .listForAuthenticatedUser({
+      type: 'owner',
+      sort: 'updated',
+      direction: 'desc',
+      perPage: 5,
+      page: 2,
     })
     .pipe(
       Effect.map(() => ({

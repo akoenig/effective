@@ -8,9 +8,9 @@ import {
 import { describe, expect, it } from '@effect/vitest'
 import { Config, Effect, Layer, Option, Redacted } from 'effect'
 import { GitHub } from '../layer.js'
-import { NotificationsService } from './NotificationsService.js'
+import { GitHubNotifications } from './GitHubNotifications.js'
 
-describe('NotificationsService', () => {
+describe('GitHubNotifications', () => {
   const RECORDINGS_PATH = './tests/recordings'
   const TEST_TOKEN = 'test-token'
 
@@ -38,12 +38,12 @@ describe('NotificationsService', () => {
   describe('listForAuthenticatedUser', () => {
     it.effect('should list notifications without options', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         const result = yield* notifications.listForAuthenticatedUser()
 
         expect(result).toBeDefined()
         expect(Option.isSome(result.data)).toBe(true)
-        
+
         if (Option.isSome(result.data)) {
           const data = result.data.value
           expect(Array.isArray(data)).toBe(true)
@@ -54,7 +54,7 @@ describe('NotificationsService', () => {
 
     it.effect('should list notifications with pagination', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         const result = yield* notifications.listForAuthenticatedUser({
           perPage: 5,
           page: 1,
@@ -62,7 +62,7 @@ describe('NotificationsService', () => {
 
         expect(result).toBeDefined()
         expect(Option.isSome(result.data)).toBe(true)
-        
+
         if (Option.isSome(result.data)) {
           const data = result.data.value
           expect(Array.isArray(data)).toBe(true)
@@ -73,7 +73,7 @@ describe('NotificationsService', () => {
 
     it.effect('should list all notifications including read', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         const result = yield* notifications.listForAuthenticatedUser({
           all: true,
           perPage: 3,
@@ -81,17 +81,17 @@ describe('NotificationsService', () => {
 
         expect(result).toBeDefined()
         expect(Option.isOption(result.data)).toBe(true)
-        
+
         if (Option.isSome(result.data)) {
           const data = result.data.value
           expect(Array.isArray(data)).toBe(true)
         }
       }).pipe(Effect.provide(TestLayer)),
     )
-    
+
     it.effect('should handle empty notification lists', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         // In real scenarios, when there are no notifications
         const result = yield* notifications.listForAuthenticatedUser({
           all: false,
@@ -108,7 +108,7 @@ describe('NotificationsService', () => {
   describe('getThread', () => {
     it.effect('should get thread notification successfully', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         // The recording shows a successful response with notification data
         const result = yield* notifications.getThread('17507535488')
 
@@ -129,7 +129,7 @@ describe('NotificationsService', () => {
   describe('markAsRead', () => {
     it.effect('should mark notification as read successfully', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         // The recording shows a successful 204 response for DELETE
         const result = yield* notifications.markAsRead('17507535488')
 
@@ -142,7 +142,7 @@ describe('NotificationsService', () => {
   describe('markAllAsRead', () => {
     it.effect('should mark all notifications as read successfully', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         // The recording shows a successful 205 response for PUT
         const result = yield* notifications.markAllAsRead()
 
@@ -155,7 +155,7 @@ describe('NotificationsService', () => {
   describe('markThreadAsRead', () => {
     it.effect('should mark thread as read successfully', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         // The recording shows a successful 205 response for PATCH
         const result = yield* notifications.markThreadAsRead('17507535488')
 
@@ -167,15 +167,15 @@ describe('NotificationsService', () => {
 
   describe('Service Layer', () => {
     it('should provide default layer', () => {
-      expect(NotificationsService.Default).toBeDefined()
-      expect(Layer.isLayer(NotificationsService.Default)).toBe(true)
+      expect(GitHubNotifications.Default).toBeDefined()
+      expect(Layer.isLayer(GitHubNotifications.Default)).toBe(true)
     })
   })
 
   describe('Error Transformation', () => {
     it.effect('should handle successful operations correctly', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
 
         // All recorded responses are successful, so we test success cases
         const threadResult = yield* notifications.getThread('17507535488')
@@ -195,13 +195,15 @@ describe('NotificationsService', () => {
       'should properly parse snake_case to camelCase using getThread',
       () =>
         Effect.gen(function* () {
-          const notifications = yield* NotificationsService
+          const notifications = yield* GitHubNotifications
           // Use getThread since it returns actual notification data
           const notification = yield* notifications.getThread('17507535488')
 
           // Verify camelCase conversion
           expect(notification).toHaveProperty('updatedAt') // from updated_at
-          expect(notification.updatedAt).toEqual(new Date('2023-01-01T00:00:00Z'))
+          expect(notification.updatedAt).toEqual(
+            new Date('2023-01-01T00:00:00Z'),
+          )
           expect(notification).toHaveProperty('lastReadAt') // from last_read_at
           expect(notification.lastReadAt).toBeUndefined()
           expect(notification).toHaveProperty('subscriptionUrl') // from subscription_url
@@ -216,24 +218,24 @@ describe('NotificationsService', () => {
         }).pipe(Effect.provide(TestLayer)),
     )
   })
-  
+
   describe('Option Handling', () => {
     it.effect('should properly handle Option for list results', () =>
       Effect.gen(function* () {
-        const notifications = yield* NotificationsService
+        const notifications = yield* GitHubNotifications
         const result = yield* notifications.listForAuthenticatedUser()
 
         // Verify the data field is an Option
         expect(Option.isOption(result.data)).toBe(true)
-        
+
         // For testing purposes, we know the test data has notifications
         expect(Option.isSome(result.data)).toBe(true)
-        
+
         if (Option.isSome(result.data)) {
           const data = result.data.value
           expect(Array.isArray(data)).toBe(true)
           expect(data.length).toBeGreaterThanOrEqual(0)
-          
+
           // Verify structure of first notification
           if (data.length > 0) {
             const notification = data[0]

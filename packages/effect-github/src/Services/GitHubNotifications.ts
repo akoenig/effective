@@ -1,4 +1,4 @@
-import { Array as EffectArray, Effect, Option, type ParseResult, Schema } from 'effect'
+import { Effect, Option, type ParseResult, Schema } from 'effect'
 import {
   ApiError,
   type AuthError,
@@ -24,8 +24,8 @@ type NotificationServiceError =
 /**
  * GitHub Notifications service implementing notification-related API endpoints
  */
-export class NotificationsService extends Effect.Service<NotificationsService>()(
-  'NotificationsService',
+export class GitHubNotifications extends Effect.Service<GitHubNotifications>()(
+  'GitHubNotifications',
   {
     effect: Effect.gen(function* () {
       const httpClient = yield* GitHubHttpClientService

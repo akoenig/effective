@@ -1,1 +1,48 @@
-{"id":"1752515339062__PUT_notifications","request":{"method":"PUT","url":"https://api.github.com/notifications","headers":{"user-agent":"***REDACTED***","accept":"***REDACTED***","x-github-api-version":"***REDACTED***","authorization":"***REDACTED***","content-type":"***REDACTED***","content-length":"***REDACTED***"},"body":"{}"},"response":{"status":205,"headers":{"date":"***REDACTED***","content-type":"***REDACTED***","content-length":"***REDACTED***","x-oauth-scopes":"***REDACTED***","x-accepted-oauth-scopes":"***REDACTED***","x-oauth-client-id":"***REDACTED***","x-github-media-type":"***REDACTED***","x-github-api-version-selected":"***REDACTED***","x-ratelimit-limit":"***REDACTED***","x-ratelimit-remaining":"***REDACTED***","x-ratelimit-reset":"***REDACTED***","x-ratelimit-used":"***REDACTED***","x-ratelimit-resource":"***REDACTED***","access-control-expose-headers":"***REDACTED***","access-control-allow-origin":"***REDACTED***","strict-transport-security":"***REDACTED***","x-frame-options":"***REDACTED***","x-content-type-options":"***REDACTED***","x-xss-protection":"***REDACTED***","referrer-policy":"***REDACTED***","content-security-policy":"***REDACTED***","vary":"***REDACTED***","server":"***REDACTED***","x-github-request-id":"***REDACTED***","connection":"***REDACTED***"},"body":null},"timestamp":"2025-07-14T17:48:59.062Z"}
+{
+  "id": "1752515339062__PUT_notifications",
+  "request": {
+    "method": "PUT",
+    "url": "https://api.github.com/notifications",
+    "headers": {
+      "user-agent": "***REDACTED***",
+      "accept": "***REDACTED***",
+      "x-github-api-version": "***REDACTED***",
+      "authorization": "***REDACTED***",
+      "content-type": "***REDACTED***",
+      "content-length": "***REDACTED***"
+    },
+    "body": "{}"
+  },
+  "response": {
+    "status": 205,
+    "headers": {
+      "date": "***REDACTED***",
+      "content-type": "***REDACTED***",
+      "content-length": "***REDACTED***",
+      "x-oauth-scopes": "***REDACTED***",
+      "x-accepted-oauth-scopes": "***REDACTED***",
+      "x-oauth-client-id": "***REDACTED***",
+      "x-github-media-type": "***REDACTED***",
+      "x-github-api-version-selected": "***REDACTED***",
+      "x-ratelimit-limit": "***REDACTED***",
+      "x-ratelimit-remaining": "***REDACTED***",
+      "x-ratelimit-reset": "***REDACTED***",
+      "x-ratelimit-used": "***REDACTED***",
+      "x-ratelimit-resource": "***REDACTED***",
+      "access-control-expose-headers": "***REDACTED***",
+      "access-control-allow-origin": "***REDACTED***",
+      "strict-transport-security": "***REDACTED***",
+      "x-frame-options": "***REDACTED***",
+      "x-content-type-options": "***REDACTED***",
+      "x-xss-protection": "***REDACTED***",
+      "referrer-policy": "***REDACTED***",
+      "content-security-policy": "***REDACTED***",
+      "vary": "***REDACTED***",
+      "server": "***REDACTED***",
+      "x-github-request-id": "***REDACTED***",
+      "connection": "***REDACTED***"
+    },
+    "body": null
+  },
+  "timestamp": "2025-07-14T17:48:59.062Z"
+}
