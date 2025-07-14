@@ -18,11 +18,10 @@ export const TEST_DATA: TestData = {
     name: 'effect-ts',
   },
   issue: {
-    // Test issue data for recording
-    number: 1, // Will be replaced with actual issue number during recording
-    title: 'Test Issue from Effect SDK Recorder',
+    number: 1,
+    title: 'Test Issue from Effect SDK',
     body: 'This is a test issue created by the Effect GitHub SDK HTTP recorder for testing purposes.',
-    labels: ['documentation', 'help wanted'],
+    labels: ['bug', 'documentation', 'help wanted'],
   } as {
     number: number
     title: string

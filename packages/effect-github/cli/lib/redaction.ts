@@ -1,6 +1,6 @@
 /**
  * GitHub-specific data redaction utilities for HTTP recordings
- * 
+ *
  * This module provides redaction functions that preserve GitHub API data structure
  * while removing sensitive information like tokens, real usernames, emails, etc.
  */
@@ -184,7 +184,7 @@ export const redactGitHubData = (obj: unknown): unknown => {
   redactUrlField(redacted, 'ssh_url')
   redactUrlField(redacted, 'git_url')
   redactUrlField(redacted, 'svn_url')
-  
+
   // Special handling for latest_comment_url (can be null)
   if (
     'latest_comment_url' in redacted &&
@@ -195,8 +195,9 @@ export const redactGitHubData = (obj: unknown): unknown => {
     'latest_comment_url' in redacted &&
     typeof redacted.latest_comment_url === 'string'
   ) {
-    redacted.latest_comment_url = redactUrl(redacted.latest_comment_url)
-      .replace(/\/comments\/\d+/g, '/comments/12345')
+    redacted.latest_comment_url = redactUrl(
+      redacted.latest_comment_url,
+    ).replace(/\/comments\/\d+/g, '/comments/12345')
   }
 
   // URL templates - redact user/org names in templates
@@ -294,42 +295,44 @@ function redactUrlField(obj: Record<string, unknown>, field: string) {
  * Helper function to redact URLs with GitHub-specific patterns
  */
 function redactUrl(url: string): string {
-  return url
-    // Replace GitHub.com URLs
-    .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
-    // Replace API URLs - handle all patterns
-    .replace(
-      /api\.github\.com\/repos\/[^/]+\/[^/]+/g,
-      'api.github.com/repos/example-user/example-repo',
-    )
-    .replace(
-      /api\.github\.com\/users\/[^/]+/g,
-      'api.github.com/users/example-user',
-    )
-    .replace(
-      /api\.github\.com\/orgs\/[^/]+/g,
-      'api.github.com/orgs/example-org',
-    )
-    // Handle patterns where example-user is already present
-    .replace(
-      /api\.github\.com\/example-user\/[^/]+\/[^/]+/g,
-      'api.github.com/repos/example-user/example-repo',
-    )
-    .replace(
-      /api\.github\.com\/example-user\/[^/]+(?=\/|$)/g,
-      'api.github.com/users/example-user',
-    )
-    .replace(
-      /github\.com\/example-user\/[^/]+/g,
-      'github.com/example-user/example-repo',
-    )
-    // Replace PR and issue numbers
-    .replace(/\/pulls\/\d+/g, '/pulls/12345')
-    .replace(/\/issues\/\d+/g, '/issues/12345')
-    // Handle SSH URLs
-    .replace(/github\.com:[^/]+/g, 'github.com:example-user')
-    .replace(
-      /github\.com:example-user\/[^/]+/g,
-      'github.com:example-user/example-repo',
-    )
+  return (
+    url
+      // Replace GitHub.com URLs
+      .replace(/github\.com\/[^/]+/g, 'github.com/example-user')
+      // Replace API URLs - handle all patterns
+      .replace(
+        /api\.github\.com\/repos\/[^/]+\/[^/]+/g,
+        'api.github.com/repos/example-user/example-repo',
+      )
+      .replace(
+        /api\.github\.com\/users\/[^/]+/g,
+        'api.github.com/users/example-user',
+      )
+      .replace(
+        /api\.github\.com\/orgs\/[^/]+/g,
+        'api.github.com/orgs/example-org',
+      )
+      // Handle patterns where example-user is already present
+      .replace(
+        /api\.github\.com\/example-user\/[^/]+\/[^/]+/g,
+        'api.github.com/repos/example-user/example-repo',
+      )
+      .replace(
+        /api\.github\.com\/example-user\/[^/]+(?=\/|$)/g,
+        'api.github.com/users/example-user',
+      )
+      .replace(
+        /github\.com\/example-user\/[^/]+/g,
+        'github.com/example-user/example-repo',
+      )
+      // Replace PR and issue numbers
+      .replace(/\/pulls\/\d+/g, '/pulls/12345')
+      .replace(/\/issues\/\d+/g, '/issues/12345')
+      // Handle SSH URLs
+      .replace(/github\.com:[^/]+/g, 'github.com:example-user')
+      .replace(
+        /github\.com:example-user\/[^/]+/g,
+        'github.com:example-user/example-repo',
+      )
+  )
 }

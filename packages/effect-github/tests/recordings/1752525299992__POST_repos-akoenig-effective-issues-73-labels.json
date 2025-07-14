@@ -1,35 +1,35 @@
 {
-  "id": "1752522663145__POST_repos-akoenig-effective-issues-19-labels",
+  "id": "1752525299992__POST_repos-akoenig-effective-issues-73-labels",
   "request": {
     "method": "POST",
-    "url": "https://api.github.com/repos/akoenig/effective/issues/19/labels",
+    "url": "https://api.github.com/repos/akoenig/effective/issues/73/labels",
     "headers": {
       "user-agent": "pulse-github-sdk",
       "accept": "application/vnd.github+json",
       "x-github-api-version": "2022-11-28",
       "content-type": "application/json",
-      "content-length": "31"
+      "content-length": "45"
     },
-    "body": "{\"labels\":[\"good first issue\"]}"
+    "body": "{\"labels\":[\"enhancement\",\"good first issue\"]}"
   },
   "response": {
     "status": 200,
     "headers": {
-      "date": "Mon, 14 Jul 2025 19:51:03 GMT",
+      "date": "Mon, 14 Jul 2025 20:34:59 GMT",
       "content-type": "application/json; charset=utf-8",
-      "content-length": "706",
+      "content-length": "662",
       "cache-control": "private, max-age=60, s-maxage=60",
       "vary": "Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With",
-      "etag": "\"d313afc84dc67b73b6a324d91b56676348ae13cb3c8708feb52118112aa729f8\"",
+      "etag": "\"01c72b6050008bbb3a237b29b0da244836e2160c849206ba260f61d77b08658f\"",
       "x-oauth-scopes": "gist, project, read:org, repo, user",
       "x-accepted-oauth-scopes": "",
       "x-oauth-client-id": "178c6fc778ccc68e1d6a",
       "x-github-media-type": "github.v3; format=json",
       "x-github-api-version-selected": "2022-11-28",
       "x-ratelimit-limit": "5000",
-      "x-ratelimit-remaining": "4966",
+      "x-ratelimit-remaining": "4742",
       "x-ratelimit-reset": "1752526167",
-      "x-ratelimit-used": "34",
+      "x-ratelimit-used": "258",
       "x-ratelimit-resource": "core",
       "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
       "access-control-allow-origin": "*",
@@ -40,27 +40,27 @@
       "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
       "content-security-policy": "default-src 'none'",
       "server": "github.com",
-      "x-github-request-id": "0920:10F34E:12C5D:13785:68755FA6",
+      "x-github-request-id": "E774:1F467:2CE3AB:2E191B:687569F3",
       "connection": "close"
     },
     "body": [
       {
-        "id": 8887203998,
-        "node_id": "LA_kwDOPGoLYM8AAAACEbf4ng",
-        "url": "https://api.github.com/repos/akoenig/effective/labels/documentation",
-        "name": "documentation",
-        "color": "0075ca",
+        "id": 8887203993,
+        "node_id": "LA_kwDOPGoLYM8AAAACEbf4mQ",
+        "url": "https://api.github.com/repos/akoenig/effective/labels/bug",
+        "name": "bug",
+        "color": "d73a4a",
         "default": true,
-        "description": "Improvements or additions to documentation"
+        "description": "Something isn't working"
       },
       {
-        "id": 8887204013,
-        "node_id": "LA_kwDOPGoLYM8AAAACEbf4rQ",
-        "url": "https://api.github.com/repos/akoenig/effective/labels/help%20wanted",
-        "name": "help wanted",
-        "color": "008672",
+        "id": 8887204007,
+        "node_id": "LA_kwDOPGoLYM8AAAACEbf4pw",
+        "url": "https://api.github.com/repos/akoenig/effective/labels/enhancement",
+        "name": "enhancement",
+        "color": "a2eeef",
         "default": true,
-        "description": "Extra attention is needed"
+        "description": "New feature or request"
       },
       {
         "id": 8887204017,
@@ -73,5 +73,5 @@
       }
     ]
   },
-  "timestamp": "2025-07-14T19:51:03.145Z"
+  "timestamp": "2025-07-14T20:34:59.992Z"
 }

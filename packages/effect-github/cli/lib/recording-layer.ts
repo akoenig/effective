@@ -12,24 +12,29 @@ import { createGitHubRedactionEffect } from './redaction.js'
 /**
  * Create recording layer with optional security redactions
  */
-export const createRecordingLayer = (token: string, redactionEnabled: boolean = true) => {
+export const createRecordingLayer = (
+  token: string,
+  redactionEnabled: boolean = true,
+) => {
   const config = HttpRecorderConfig.make({
     path: RECORDINGS_PATH,
-    excludedHeaders: redactionEnabled ? [
-      'authorization',
-      'x-github-token',
-      'cookie',
-      'set-cookie',
-      'x-api-key',
-      'x-ratelimit-remaining',
-      'x-ratelimit-reset',
-      'x-ratelimit-used',
-      'etag',
-      'last-modified',
-      'server',
-      'x-github-request-id',
-      'x-github-media-type',
-    ] : [],
+    excludedHeaders: redactionEnabled
+      ? [
+          'authorization',
+          'x-github-token',
+          'cookie',
+          'set-cookie',
+          'x-api-key',
+          'x-ratelimit-remaining',
+          'x-ratelimit-reset',
+          'x-ratelimit-used',
+          'etag',
+          'last-modified',
+          'server',
+          'x-github-request-id',
+          'x-github-media-type',
+        ]
+      : [],
     redaction: redactionEnabled ? createGitHubRedactionEffect : undefined,
   })
 

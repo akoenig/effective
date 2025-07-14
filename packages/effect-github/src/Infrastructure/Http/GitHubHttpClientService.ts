@@ -71,7 +71,10 @@ export class GitHubHttpClientService extends Effect.Service<GitHubHttpClientServ
           // Add body for POST/PUT/PATCH/DELETE requests
           if (
             options.body &&
-            (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')
+            (method === 'POST' ||
+              method === 'PUT' ||
+              method === 'PATCH' ||
+              method === 'DELETE')
           ) {
             request = yield* HttpClientRequest.bodyJson(options.body)(
               request,

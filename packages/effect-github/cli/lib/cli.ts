@@ -18,7 +18,9 @@ const services = Options.choice('services', [
   'issues',
 ]).pipe(
   Options.repeated,
-  Options.withDescription('Select which service recorders to run. Can be specified multiple times. If omitted, all recorders will be active.'),
+  Options.withDescription(
+    'Select which service recorders to run. Can be specified multiple times. If omitted, all recorders will be active.',
+  ),
   Options.withAlias('s'),
   Options.optional,
 )
@@ -30,7 +32,9 @@ const clean = Options.boolean('clean').pipe(
 )
 
 const noRedaction = Options.boolean('no-redaction').pipe(
-  Options.withDescription('Disable data redaction in recordings (default: redaction enabled)'),
+  Options.withDescription(
+    'Disable data redaction in recordings (default: redaction enabled)',
+  ),
   Options.withAlias('n'),
   Options.withDefault(false),
 )

@@ -5,9 +5,13 @@ import { Schema } from 'effect'
  * Maps camelCase to snake_case for GitHub API compatibility
  */
 export const IssueListOptions = Schema.Struct({
-  milestone: Schema.optional(Schema.Union(Schema.String, Schema.Literal('*', 'none'))),
+  milestone: Schema.optional(
+    Schema.Union(Schema.String, Schema.Literal('*', 'none')),
+  ),
   state: Schema.optional(Schema.Literal('open', 'closed', 'all')),
-  assignee: Schema.optional(Schema.Union(Schema.String, Schema.Literal('*', 'none'))),
+  assignee: Schema.optional(
+    Schema.Union(Schema.String, Schema.Literal('*', 'none')),
+  ),
   creator: Schema.optional(Schema.String),
   mentioned: Schema.optional(Schema.String),
   labels: Schema.optional(Schema.String), // Comma-separated list of label names
@@ -42,9 +46,9 @@ export const UpdateIssueData = Schema.Struct({
   body: Schema.optional(Schema.String),
   assignee: Schema.optional(Schema.Union(Schema.String, Schema.Null)),
   state: Schema.optional(Schema.Literal('open', 'closed')),
-  stateReason: Schema.optional(Schema.Literal('completed', 'not_planned', 'reopened')).pipe(
-    Schema.fromKey('state_reason'),
-  ),
+  stateReason: Schema.optional(
+    Schema.Literal('completed', 'not_planned', 'reopened'),
+  ).pipe(Schema.fromKey('state_reason')),
   milestone: Schema.optional(Schema.Union(Schema.Number, Schema.Null)),
   labels: Schema.optional(Schema.Array(Schema.String)),
   assignees: Schema.optional(Schema.Array(Schema.String)),
@@ -59,7 +63,9 @@ export const CreateIssueCommentData = Schema.Struct({
   body: Schema.String,
 })
 
-export type CreateIssueCommentData = Schema.Schema.Type<typeof CreateIssueCommentData>
+export type CreateIssueCommentData = Schema.Schema.Type<
+  typeof CreateIssueCommentData
+>
 
 /**
  * Data for updating an issue comment
@@ -68,4 +74,6 @@ export const UpdateIssueCommentData = Schema.Struct({
   body: Schema.String,
 })
 
-export type UpdateIssueCommentData = Schema.Schema.Type<typeof UpdateIssueCommentData>
+export type UpdateIssueCommentData = Schema.Schema.Type<
+  typeof UpdateIssueCommentData
+>
