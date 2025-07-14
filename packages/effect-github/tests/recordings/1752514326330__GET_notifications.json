@@ -1,8 +1,8 @@
 {
-  "id": "1752170736523__GET_repos-non-existent-owner-12345-non-existent-repo-67890",
+  "id": "1752514326330__GET_notifications",
   "request": {
     "method": "GET",
-    "url": "https://api.github.com/repos/non-existent-owner-12345/non-existent-repo-67890",
+    "url": "https://api.github.com/notifications?perPage=5&page=1",
     "headers": {
       "user-agent": "***REDACTED***",
       "accept": "***REDACTED***",
@@ -11,11 +11,15 @@
     }
   },
   "response": {
-    "status": 404,
+    "status": 200,
     "headers": {
       "date": "***REDACTED***",
       "content-type": "***REDACTED***",
       "content-length": "***REDACTED***",
+      "cache-control": "***REDACTED***",
+      "vary": "***REDACTED***",
+      "etag": "***REDACTED***",
+      "x-poll-interval": "***REDACTED***",
       "x-oauth-scopes": "***REDACTED***",
       "x-accepted-oauth-scopes": "***REDACTED***",
       "x-oauth-client-id": "***REDACTED***",
@@ -34,16 +38,11 @@
       "x-xss-protection": "***REDACTED***",
       "referrer-policy": "***REDACTED***",
       "content-security-policy": "***REDACTED***",
-      "vary": "***REDACTED***",
       "server": "***REDACTED***",
       "x-github-request-id": "***REDACTED***",
       "connection": "***REDACTED***"
     },
-    "body": {
-      "message": "Example message",
-      "documentation_url": "https://docs.github.com/rest/repos/repos#get-a-repository",
-      "status": "404"
-    }
+    "body": []
   },
-  "timestamp": "2025-07-10T18:05:36.523Z"
+  "timestamp": "2025-07-14T17:32:06.330Z"
 }
