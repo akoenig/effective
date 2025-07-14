@@ -142,11 +142,11 @@ The recording system includes several security measures:
 
 The record command captures HTTP interactions for the following service methods:
 
-**NotificationsService:**
+**GitHubNotifications:**
 - `listForAuthenticatedUser` - Various parameter combinations
 - `getThread` - Sample thread ID (expected to fail with 404)
 
-**RepositoriesService:**
+**GitHubRepositories:**
 - `listForAuthenticatedUser` - Default and filtered
 - `get` - Both existing and non-existent repositories  
 - `listForUser` - Public user repositories

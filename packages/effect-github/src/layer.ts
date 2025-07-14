@@ -7,7 +7,7 @@ import {
   GitHubHttpClientService,
 } from './Infrastructure/index.js'
 // Services
-import { NotificationsService, RepositoriesService } from './Services/index.js'
+import { GitHubNotifications, GitHubRepositories } from './Services/index.js'
 
 /**
  * Complete GitHub SDK layer that provides all services except auth
@@ -16,8 +16,8 @@ import { NotificationsService, RepositoriesService } from './Services/index.js'
 export const GitHubSDKWithoutAuth = Layer.mergeAll(
   GitHubHttpClientConfigService.Default,
   GitHubHttpClientService.Default,
-  RepositoriesService.Default,
-  NotificationsService.Default,
+  GitHubRepositories.Default,
+  GitHubNotifications.Default,
 )
 
 /**
@@ -27,8 +27,8 @@ export const GitHubSDK = Layer.mergeAll(
   GitHubHttpClientConfigService.Default,
   GitHubHttpClientService.Default,
   GitHubAuthService.Default,
-  RepositoriesService.Default,
-  NotificationsService.Default,
+  GitHubRepositories.Default,
+  GitHubNotifications.Default,
 )
 
 /**
@@ -41,8 +41,8 @@ export const createGitHubSDK = () =>
     GitHubHttpClientConfigService.Default,
     GitHubHttpClientService.Default,
     GitHubAuthService.Default,
-    RepositoriesService.Default,
-    NotificationsService.Default,
+    GitHubRepositories.Default,
+    GitHubNotifications.Default,
   )
 
 /**
@@ -85,8 +85,8 @@ export const GitHub = {
 
     // 3. API services layer - provides GitHub API services with their dependencies
     const APIServicesLayer = Layer.mergeAll(
-      Layer.provide(RepositoriesService.Default, CoreServicesLayer),
-      Layer.provide(NotificationsService.Default, CoreServicesLayer),
+      Layer.provide(GitHubRepositories.Default, CoreServicesLayer),
+      Layer.provide(GitHubNotifications.Default, CoreServicesLayer),
     )
 
     // 4. Final layer that provides everything

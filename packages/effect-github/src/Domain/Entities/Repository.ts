@@ -133,13 +133,15 @@ export const Repository = Schema.Struct({
   }).pipe(Schema.fromKey('web_commit_signoff_required')),
 
   // Repository permissions (commonly accessed)
-  permissions: Schema.optional(Schema.Struct({
-    admin: Schema.Boolean,
-    maintain: Schema.Boolean,
-    push: Schema.Boolean,
-    triage: Schema.Boolean,
-    pull: Schema.Boolean,
-  })),
+  permissions: Schema.optional(
+    Schema.Struct({
+      admin: Schema.Boolean,
+      maintain: Schema.Boolean,
+      push: Schema.Boolean,
+      triage: Schema.Boolean,
+      pull: Schema.Boolean,
+    }),
+  ),
 
   // Optional fields that may appear in some contexts
   license: GitHub.nullable(License),
