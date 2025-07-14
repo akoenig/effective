@@ -1,2 +1,3 @@
-export * from './NotificationsService.js'
-export * from './RepositoriesService.js'
+export * from './GitHubIssues.js'
+export * from './GitHubNotifications.js'
+export * from './GitHubRepositories.js'

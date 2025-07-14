@@ -1,3 +1,5 @@
+export * from './Issue.js'
+export * from './IssueComment.js'
 export * from './Notification.js'
 export * from './PrivateUser.js'
 export * from './Repository.js'
