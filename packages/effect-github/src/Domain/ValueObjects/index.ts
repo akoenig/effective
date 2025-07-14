@@ -1,4 +1,5 @@
 export * from './AuthConfig.js'
+export * from './IssueListOptions.js'
 export * from './License.js'
 export * from './ListResponse.js'
 export * from './MinimalRepository.js'
