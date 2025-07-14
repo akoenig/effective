@@ -5,12 +5,12 @@
 import { FileSystem } from '@effect/platform'
 import { Console, Effect } from 'effect'
 import { RECORDINGS_PATH } from './config.js'
-import { createRecordingLayer } from './recording-layer.js'
 import {
   recordIssuesMethods,
   recordNotificationsMethods,
   recordRepositoriesMethods,
 } from './recorders/mod.js'
+import { createRecordingLayer } from './recording-layer.js'
 import type { RecordingResult } from './types.js'
 
 /**
@@ -64,9 +64,13 @@ export const recordProgram = (config: RecordingConfig) =>
     // Create recording layer with the provided token
     yield* Console.log('🔧 Setting up HTTP recording layer...')
     if (config.redactionEnabled) {
-      yield* Console.log('🔒 Data redaction enabled (use --no-redaction to disable)')
+      yield* Console.log(
+        '🔒 Data redaction enabled (use --no-redaction to disable)',
+      )
     } else {
-      yield* Console.log('⚠️  Data redaction disabled - recordings will contain real data!')
+      yield* Console.log(
+        '⚠️  Data redaction disabled - recordings will contain real data!',
+      )
     }
     const layer = createRecordingLayer(config.token, config.redactionEnabled)
 
@@ -83,11 +87,13 @@ export const recordProgram = (config: RecordingConfig) =>
     if (shouldRecordNotifications) activeRecorders.push('notifications')
     if (shouldRecordRepositories) activeRecorders.push('repositories')
     if (shouldRecordIssues) activeRecorders.push('issues')
-    
+
     if (config.services.length === 0) {
       yield* Console.log('🎯 Recording all services (default)')
     } else {
-      yield* Console.log(`🎯 Recording selected services: ${activeRecorders.join(', ')}`)
+      yield* Console.log(
+        `🎯 Recording selected services: ${activeRecorders.join(', ')}`,
+      )
     }
 
     const allResults: RecordingResult[] = []

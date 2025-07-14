@@ -7,7 +7,11 @@ import {
   GitHubHttpClientService,
 } from './Infrastructure/index.js'
 // Services
-import { GitHubIssues, GitHubNotifications, GitHubRepositories } from './Services/index.js'
+import {
+  GitHubIssues,
+  GitHubNotifications,
+  GitHubRepositories,
+} from './Services/index.js'
 
 /**
  * Complete GitHub SDK layer that provides all services except auth

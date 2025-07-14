@@ -88,27 +88,27 @@ export const Issue = Schema.Struct({
     Schema.fromKey('node_id'),
   ),
   number: Schema.Number,
-  
+
   // Basic properties
   title: Schema.String,
   body: GitHub.nullable(Schema.String),
   state: Schema.Literal('open', 'closed'),
-  stateReason: Schema.propertySignature(GitHub.nullable(Schema.Literal('completed', 'not_planned', 'reopened'))).pipe(
-    Schema.fromKey('state_reason'),
-  ),
-  
+  stateReason: Schema.propertySignature(
+    GitHub.nullable(Schema.Literal('completed', 'not_planned', 'reopened')),
+  ).pipe(Schema.fromKey('state_reason')),
+
   // Users
   user: GitHub.nullable(User),
   assignee: GitHub.nullable(User),
   assignees: Schema.Array(User),
-  
+
   // Labels and milestone
   labels: Schema.Array(IssueLabel),
   milestone: GitHub.nullable(IssueMilestone),
-  
+
   // Counts and statistics
   comments: Schema.Number,
-  
+
   // URLs
   url: Schema.String,
   repositoryUrl: Schema.propertySignature(Schema.String).pipe(
@@ -126,7 +126,7 @@ export const Issue = Schema.Struct({
   htmlUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('html_url'),
   ),
-  
+
   // Timestamps
   createdAt: Schema.propertySignature(Schema.DateFromString).pipe(
     Schema.fromKey('created_at'),
@@ -137,43 +137,49 @@ export const Issue = Schema.Struct({
   closedAt: Schema.propertySignature(GitHub.nullableDate()).pipe(
     Schema.fromKey('closed_at'),
   ),
-  
+
   // Optional fields
-  activeLockReason: Schema.propertySignature(GitHub.nullable(Schema.Literal('off-topic', 'too heated', 'resolved', 'spam'))).pipe(
-    Schema.fromKey('active_lock_reason'),
-  ),
+  activeLockReason: Schema.propertySignature(
+    GitHub.nullable(
+      Schema.Literal('off-topic', 'too heated', 'resolved', 'spam'),
+    ),
+  ).pipe(Schema.fromKey('active_lock_reason')),
   locked: Schema.Boolean,
   pullRequest: Schema.optional(IssuePullRequest),
   repository: Schema.optional(MinimalRepository),
-  
+
   // Author association
-  authorAssociation: Schema.propertySignature(Schema.Literal(
-    'COLLABORATOR',
-    'CONTRIBUTOR', 
-    'FIRST_TIMER',
-    'FIRST_TIME_CONTRIBUTOR',
-    'MANNEQUIN',
-    'MEMBER',
-    'NONE',
-    'OWNER'
-  )).pipe(Schema.fromKey('author_association')),
-  
-  // Reactions
-  reactions: Schema.optional(Schema.Struct({
-    url: Schema.String,
-    totalCount: Schema.propertySignature(Schema.Number).pipe(
-      Schema.fromKey('total_count'),
+  authorAssociation: Schema.propertySignature(
+    Schema.Literal(
+      'COLLABORATOR',
+      'CONTRIBUTOR',
+      'FIRST_TIMER',
+      'FIRST_TIME_CONTRIBUTOR',
+      'MANNEQUIN',
+      'MEMBER',
+      'NONE',
+      'OWNER',
     ),
-    '+1': Schema.Number,
-    '-1': Schema.Number,
-    laugh: Schema.Number,
-    hooray: Schema.Number,
-    confused: Schema.Number,
-    heart: Schema.Number,
-    rocket: Schema.Number,
-    eyes: Schema.Number,
-  })),
-  
+  ).pipe(Schema.fromKey('author_association')),
+
+  // Reactions
+  reactions: Schema.optional(
+    Schema.Struct({
+      url: Schema.String,
+      totalCount: Schema.propertySignature(Schema.Number).pipe(
+        Schema.fromKey('total_count'),
+      ),
+      '+1': Schema.Number,
+      '-1': Schema.Number,
+      laugh: Schema.Number,
+      hooray: Schema.Number,
+      confused: Schema.Number,
+      heart: Schema.Number,
+      rocket: Schema.Number,
+      eyes: Schema.Number,
+    }),
+  ),
+
   // Draft (for pull requests that are also issues)
   draft: Schema.optional(Schema.Boolean),
 })

@@ -1,36 +1,36 @@
 {
-  "id": "1752522660601__POST_repos-akoenig-effective-issues",
+  "id": "1752525299189__POST_repos-akoenig-effective-issues-75-comments",
   "request": {
     "method": "POST",
-    "url": "https://api.github.com/repos/akoenig/effective/issues",
+    "url": "https://api.github.com/repos/akoenig/effective/issues/75/comments",
     "headers": {
       "user-agent": "pulse-github-sdk",
       "accept": "application/vnd.github+json",
       "x-github-api-version": "2022-11-28",
       "content-type": "application/json",
-      "content-length": "187"
+      "content-length": "53"
     },
-    "body": "{\"title\":\"Test Issue from Effect SDK Recorder\",\"body\":\"This is a test issue created by the Effect GitHub SDK HTTP recorder for testing purposes.\",\"labels\":[\"documentation\",\"help wanted\"]}"
+    "body": "{\"body\":\"This is a test comment from the Effect SDK\"}"
   },
   "response": {
     "status": 201,
     "headers": {
-      "date": "Mon, 14 Jul 2025 19:51:00 GMT",
+      "date": "Mon, 14 Jul 2025 20:34:59 GMT",
       "content-type": "application/json; charset=utf-8",
-      "content-length": "2692",
+      "content-length": "1639",
       "cache-control": "private, max-age=60, s-maxage=60",
       "vary": "Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With",
-      "etag": "\"ccf2a59640c5848d3d2fa7b4dd0fd860c9abf64d4f59a7fc5dd7efef78600bac\"",
+      "etag": "\"5fff9285b793691882a21096efc930fac3ad7148ac108da8577303be5cfce9c0\"",
       "x-oauth-scopes": "gist, project, read:org, repo, user",
       "x-accepted-oauth-scopes": "",
       "x-oauth-client-id": "178c6fc778ccc68e1d6a",
-      "location": "https://api.github.com/repos/akoenig/effective/issues/19",
+      "location": "https://api.github.com/repos/akoenig/effective/issues/comments/3070898644",
       "x-github-media-type": "github.v3; format=json",
       "x-github-api-version-selected": "2022-11-28",
       "x-ratelimit-limit": "5000",
-      "x-ratelimit-remaining": "4970",
+      "x-ratelimit-remaining": "4743",
       "x-ratelimit-reset": "1752526167",
-      "x-ratelimit-used": "30",
+      "x-ratelimit-used": "257",
       "x-ratelimit-resource": "core",
       "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
       "access-control-allow-origin": "*",
@@ -41,25 +41,20 @@
       "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
       "content-security-policy": "default-src 'none'",
       "server": "github.com",
-      "x-github-request-id": "08DC:348DBE:14262:14D4B:68755FA4",
+      "x-github-request-id": "E773:3B8E61:2A2794:2B5C3D:687569F2",
       "connection": "close"
     },
     "body": {
-      "url": "https://api.github.com/repos/akoenig/effective/issues/19",
-      "repository_url": "https://api.github.com/repos/akoenig/effective",
-      "labels_url": "https://api.github.com/repos/akoenig/effective/issues/19/labels{/name}",
-      "comments_url": "https://api.github.com/repos/akoenig/effective/issues/19/comments",
-      "events_url": "https://api.github.com/repos/akoenig/effective/issues/19/events",
-      "html_url": "https://github.com/akoenig/effective/issues/19",
-      "id": 3229848921,
-      "node_id": "I_kwDOPGoLYM7Ag5VZ",
-      "number": 19,
-      "title": "Test Issue from Effect SDK Recorder",
+      "url": "https://api.github.com/repos/akoenig/effective/issues/comments/3070898644",
+      "html_url": "https://github.com/akoenig/effective/issues/73#issuecomment-3070898644",
+      "issue_url": "https://api.github.com/repos/akoenig/effective/issues/73",
+      "id": 3070898644,
+      "node_id": "IC_kwDOPGoLYM63CjHU",
       "user": {
         "login": "akoenig",
         "id": 224910,
         "node_id": "MDQ6VXNlcjIyNDkxMA==",
-        "avatar_url": "https://avatars.githubusercontent.com/u/224910?v=4",
+        "avatar_url": "https://avatars.githubusercontent.com/u/224910?u=fd1149e758901e0facc4c26671853ac49c2fe79a&v=4",
         "gravatar_id": "",
         "url": "https://api.github.com/users/akoenig",
         "html_url": "https://github.com/akoenig",
@@ -76,46 +71,12 @@
         "user_view_type": "public",
         "site_admin": false
       },
-      "labels": [
-        {
-          "id": 8887203998,
-          "node_id": "LA_kwDOPGoLYM8AAAACEbf4ng",
-          "url": "https://api.github.com/repos/akoenig/effective/labels/documentation",
-          "name": "documentation",
-          "color": "0075ca",
-          "default": true,
-          "description": "Improvements or additions to documentation"
-        },
-        {
-          "id": 8887204013,
-          "node_id": "LA_kwDOPGoLYM8AAAACEbf4rQ",
-          "url": "https://api.github.com/repos/akoenig/effective/labels/help%20wanted",
-          "name": "help wanted",
-          "color": "008672",
-          "default": true,
-          "description": "Extra attention is needed"
-        }
-      ],
-      "state": "open",
-      "locked": false,
-      "assignee": null,
-      "assignees": [],
-      "milestone": null,
-      "comments": 0,
-      "created_at": "2025-07-14T19:51:00Z",
-      "updated_at": "2025-07-14T19:51:00Z",
-      "closed_at": null,
+      "created_at": "2025-07-14T20:34:59Z",
+      "updated_at": "2025-07-14T20:34:59Z",
       "author_association": "OWNER",
-      "active_lock_reason": null,
-      "sub_issues_summary": {
-        "total": 0,
-        "completed": 0,
-        "percent_completed": 0
-      },
-      "body": "This is a test issue created by the Effect GitHub SDK HTTP recorder for testing purposes.",
-      "closed_by": null,
+      "body": "This is a test comment from the Effect SDK",
       "reactions": {
-        "url": "https://api.github.com/repos/akoenig/effective/issues/19/reactions",
+        "url": "https://api.github.com/repos/akoenig/effective/issues/comments/3070898644/reactions",
         "total_count": 0,
         "+1": 0,
         "-1": 0,
@@ -126,10 +87,8 @@
         "rocket": 0,
         "eyes": 0
       },
-      "timeline_url": "https://api.github.com/repos/akoenig/effective/issues/19/timeline",
-      "performed_via_github_app": null,
-      "state_reason": null
+      "performed_via_github_app": null
     }
   },
-  "timestamp": "2025-07-14T19:51:00.601Z"
+  "timestamp": "2025-07-14T20:34:59.189Z"
 }

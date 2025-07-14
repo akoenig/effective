@@ -346,7 +346,9 @@ const recordAdditionalRepositoryCases = (repositories: GitHubRepositories) =>
     results.push(authListResult6)
 
     // 13. Complex options encoding test
-    yield* Console.log('  → listForAuthenticatedUser (complex options encoding)')
+    yield* Console.log(
+      '  → listForAuthenticatedUser (complex options encoding)',
+    )
     const authListResult7 = yield* repositories
       .listForAuthenticatedUser({
         type: 'owner',

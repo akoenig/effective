@@ -1,8 +1,8 @@
 {
-  "id": "1752522664141__GET_repos-non-existent-owner-12345-non-existent-repo-67890-issues",
+  "id": "1752525298646__GET_repos-akoenig-effective-issues-75-comments",
   "request": {
     "method": "GET",
-    "url": "https://api.github.com/repos/non-existent-owner-12345/non-existent-repo-67890/issues",
+    "url": "https://api.github.com/repos/akoenig/effective/issues/75/comments",
     "headers": {
       "user-agent": "pulse-github-sdk",
       "accept": "application/vnd.github+json",
@@ -10,20 +10,23 @@
     }
   },
   "response": {
-    "status": 404,
+    "status": 200,
     "headers": {
-      "date": "Mon, 14 Jul 2025 19:51:04 GMT",
+      "date": "Mon, 14 Jul 2025 20:34:58 GMT",
       "content-type": "application/json; charset=utf-8",
-      "content-length": "126",
+      "content-length": "2",
+      "cache-control": "private, max-age=60, s-maxage=60",
+      "vary": "Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With",
+      "etag": "\"7f013fec3cdc99f8ff4395fe319489f30ab556ed148557345606035acb30e018\"",
       "x-oauth-scopes": "gist, project, read:org, repo, user",
-      "x-accepted-oauth-scopes": "repo",
+      "x-accepted-oauth-scopes": "",
       "x-oauth-client-id": "178c6fc778ccc68e1d6a",
       "x-github-media-type": "github.v3; format=json",
       "x-github-api-version-selected": "2022-11-28",
       "x-ratelimit-limit": "5000",
-      "x-ratelimit-remaining": "4964",
+      "x-ratelimit-remaining": "4744",
       "x-ratelimit-reset": "1752526167",
-      "x-ratelimit-used": "36",
+      "x-ratelimit-used": "256",
       "x-ratelimit-resource": "core",
       "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
       "access-control-allow-origin": "*",
@@ -33,16 +36,11 @@
       "x-xss-protection": "0",
       "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
       "content-security-policy": "default-src 'none'",
-      "vary": "Accept-Encoding, Accept, X-Requested-With",
       "server": "github.com",
-      "x-github-request-id": "093A:89F72:1624D:16D93:68755FA7",
+      "x-github-request-id": "E772:89F72:2951BA:2A8567:687569F2",
       "connection": "close"
     },
-    "body": {
-      "message": "Not Found",
-      "documentation_url": "https://docs.github.com/rest/issues/issues#list-repository-issues",
-      "status": "404"
-    }
+    "body": []
   },
-  "timestamp": "2025-07-14T19:51:04.141Z"
+  "timestamp": "2025-07-14T20:34:58.646Z"
 }
