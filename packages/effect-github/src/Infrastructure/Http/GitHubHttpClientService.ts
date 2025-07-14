@@ -68,10 +68,10 @@ export class GitHubHttpClientService extends Effect.Service<GitHubHttpClientServ
             )
           }
 
-          // Add body for POST/PUT/PATCH requests
+          // Add body for POST/PUT/PATCH/DELETE requests
           if (
             options.body &&
-            (method === 'POST' || method === 'PUT' || method === 'PATCH')
+            (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')
           ) {
             request = yield* HttpClientRequest.bodyJson(options.body)(
               request,
@@ -166,10 +166,11 @@ export class GitHubHttpClientService extends Effect.Service<GitHubHttpClientServ
         ): Effect.Effect<A, HttpError | ApiError> =>
           makeRequest<A>('PATCH', path, { ...options, body }),
 
-        delete: <A>(
+        delete: <A, B = undefined>(
           path: string,
           options?: {
             readonly headers?: Record<string, string>
+            readonly body?: B
           },
         ): Effect.Effect<A, HttpError | ApiError> =>
           makeRequest<A>('DELETE', path, options),
