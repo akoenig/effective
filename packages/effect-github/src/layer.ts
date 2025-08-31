@@ -3,9 +3,11 @@ import { Config, Layer, type Redacted } from 'effect'
 import {
   GitHubAuthConfigService,
   GitHubAuthService,
+} from './Infrastructure/Auth/GitHubAuthService.js'
+import {
   GitHubHttpClientConfigService,
   GitHubHttpClientService,
-} from './Infrastructure/index.js'
+} from './Infrastructure/Http/GitHubHttpClientService.js'
 // Services
 import {
   GitHubIssues,

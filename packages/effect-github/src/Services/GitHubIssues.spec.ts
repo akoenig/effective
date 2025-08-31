@@ -105,10 +105,12 @@ describe('GitHubIssues', () => {
           Effect.gen(function* () {
             expect(error._tag).toBe('IssueError')
             expect(error.message).toContain('not found')
-            expect(error.repository).toBe(
-              'non-existent-owner-12345/non-existent-repo-67890',
-            )
-            expect(error.operation).toBe('list')
+            if (error._tag === 'IssueError') {
+              expect(error.repository).toBe(
+                'non-existent-owner-12345/non-existent-repo-67890',
+              )
+              expect(error.operation).toBe('list')
+            }
           }),
         ),
         Effect.provide(TestLayer),
@@ -155,9 +157,11 @@ describe('GitHubIssues', () => {
           Effect.gen(function* () {
             expect(error._tag).toBe('IssueError')
             expect(error.message).toContain('not found')
-            expect(error.issueNumber).toBe(999999999)
-            expect(error.repository).toBe(`${TEST_OWNER}/${TEST_REPO}`)
-            expect(error.operation).toBe('get')
+            if (error._tag === 'IssueError') {
+              expect(error.issueNumber).toBe(999999999)
+              expect(error.repository).toBe(`${TEST_OWNER}/${TEST_REPO}`)
+              expect(error.operation).toBe('get')
+            }
           }),
         ),
         Effect.provide(TestLayer),
@@ -185,7 +189,7 @@ describe('GitHubIssues', () => {
         expect(issue.createdAt).toBeInstanceOf(Date)
         expect(issue.updatedAt).toBeInstanceOf(Date)
         expect(issue.labels).toHaveLength(1)
-        expect(issue.labels[0].name).toBe('bug')
+        expect(issue.labels[0]?.name).toBe('bug')
       }).pipe(Effect.provide(TestLayer)),
     )
   })

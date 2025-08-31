@@ -1,4 +1,5 @@
 import { Effect, Option, type ParseResult, Schema } from 'effect'
+import * as EffectArray from 'effect/Array'
 import {
   ApiError,
   type AuthError,
@@ -74,7 +75,9 @@ export class GitHubRepositories extends Effect.Service<GitHubRepositories>()(
           )(normalizedData)
 
           return {
-            data: Option.some(repositories),
+            data: EffectArray.isNonEmptyReadonlyArray(repositories)
+              ? Option.some(repositories)
+              : Option.none(),
           }
         })
 
@@ -145,7 +148,9 @@ export class GitHubRepositories extends Effect.Service<GitHubRepositories>()(
           )(normalizedData)
 
           return {
-            data: Option.some(repositories),
+            data: EffectArray.isNonEmptyReadonlyArray(repositories)
+              ? Option.some(repositories)
+              : Option.none(),
           }
         })
 
@@ -184,7 +189,9 @@ export class GitHubRepositories extends Effect.Service<GitHubRepositories>()(
           )(normalizedData)
 
           return {
-            data: Option.some(repositories),
+            data: EffectArray.isNonEmptyReadonlyArray(repositories)
+              ? Option.some(repositories)
+              : Option.none(),
           }
         })
 

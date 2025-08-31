@@ -262,9 +262,7 @@ export class GitHubIssues extends Effect.Service<GitHubIssues>()(
           )(normalizedData)
 
           return {
-            data: EffectArray.isNonEmptyReadonlyArray(comments)
-              ? Option.some(comments)
-              : Option.none(),
+            data: Option.some(comments),
           }
         })
 

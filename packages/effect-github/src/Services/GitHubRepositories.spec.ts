@@ -83,11 +83,9 @@ describe('GitHubRepositories', () => {
           const data = result.data.value
           expect(Array.isArray(data)).toBe(true)
 
-          // Verify the results respect the filters (NonEmptyArray guarantees at least one item)
-          const repo1 = data[0] // Guaranteed to exist
-          if (data.length > 1) {
-            const repo2 = data[1] // Safe to access when length > 1
-
+          // Verify the results respect the filters (recordings guarantee multiple repos)
+          const [repo1, repo2] = data
+          if (repo2) {
             // Check that repos are sorted by updated time (desc)
             expect(repo1.updatedAt.getTime()).toBeGreaterThanOrEqual(
               repo2.updatedAt.getTime(),
@@ -300,11 +298,9 @@ describe('GitHubRepositories', () => {
           const data = result.data.value
           expect(Array.isArray(data)).toBe(true)
 
-          // Verify sorting (NonEmptyArray guarantees at least one item)
-          const repo1 = data[0] // Guaranteed to exist
-          if (data.length > 1) {
-            const repo2 = data[1] // Safe to access when length > 1
-
+          // Verify sorting (recordings guarantee multiple repos)
+          const [repo1, repo2] = data
+          if (repo2) {
             expect(repo1.createdAt.getTime()).toBeLessThanOrEqual(
               repo2.createdAt.getTime(),
             )

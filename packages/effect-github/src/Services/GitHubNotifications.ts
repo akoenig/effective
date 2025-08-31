@@ -1,4 +1,5 @@
 import { Effect, Option, type ParseResult, Schema } from 'effect'
+import * as EffectArray from 'effect/Array'
 import {
   ApiError,
   type AuthError,
@@ -60,7 +61,9 @@ export class GitHubNotifications extends Effect.Service<GitHubNotifications>()(
           )(normalizedData)
 
           return {
-            data: Option.some(notifications),
+            data: EffectArray.isNonEmptyReadonlyArray(notifications)
+              ? Option.some(notifications)
+              : Option.none(),
           }
         })
 

@@ -18,6 +18,6 @@ export const ListResponse = <A>(itemSchema: Schema.Schema<A>) =>
 
 export type ListResponseType<A> = {
   readonly data: Option.Option<NonEmptyReadonlyArray<A>>
-  readonly totalCount?: number
-  readonly incompleteResults?: boolean
+  readonly totalCount?: number | undefined
+  readonly incompleteResults?: boolean | undefined
 }
