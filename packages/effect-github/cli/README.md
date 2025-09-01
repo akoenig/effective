@@ -45,18 +45,24 @@ pnpm cli:test --help
 
 ### Record Command
 
-Generates HTTP recordings for all GitHub SDK service methods using the `@akoenig/effect-http-recorder` package.
+Generates HTTP recordings for all GitHub SDK service methods using the `@akoenig/effect-http-recorder` package. The implementation uses a modular architecture with separate modules for redaction, service recorders, and recording orchestration.
 
 ```bash
-# Basic usage - record all services
+# Basic usage - record all services with redaction (default)
 pnpm cli:record --token=your-github-token
 
 # Record specific services only
 pnpm cli record --token=your-github-token --services=repositories
-pnpm cli record -t your-token -s notifications -s repositories
+pnpm cli record -t your-token -s notifications -s repositories -s issues
 
 # Clean recordings before recording
 pnpm cli:record --token=your-github-token --clean
+
+# Disable data redaction (exposes real data - use with caution!)
+pnpm cli:record --token=your-github-token --no-redaction
+
+# Combine options
+pnpm cli record -t your-token -s issues -c -n
 
 # View help
 pnpm cli record --help
@@ -64,8 +70,9 @@ pnpm cli record --help
 
 **Options:**
 - `--token, -t` (required): GitHub personal access token
-- `--services, -s` (optional): Services to record. Can be specified multiple times. Options: `notifications`, `repositories`. Default: all services
-- `--clean, -c` (optional): Clean the recordings directory before recording. Default: false
+- `--services, -s` (optional): Select which service recorders to run. Can be specified multiple times. Options: `notifications`, `repositories`, `issues`. If omitted, all recorders will be active.
+- `--clean, -c` (optional): Clean the recordings directory before recording. Default: `false`
+- `--no-redaction, -n` (optional): Disable data redaction in recordings. Default: `false` (redaction enabled)
 
 ### Clean Command
 
@@ -123,49 +130,100 @@ You need a valid GitHub personal access token with appropriate permissions:
 
 ### Security & Privacy
 
-The recording system includes several security measures:
+The recording system includes comprehensive security measures that can be controlled via CLI flags:
 
-1. **Header Exclusion**: Sensitive headers are automatically excluded:
-   - `authorization`
-   - `x-github-token` 
-   - `cookie`
-   - `set-cookie`
-   - `x-api-key`
+**Default Security (Redaction Enabled):**
 
-2. **Response Redaction**: The script redacts sensitive data:
-   - Email addresses are replaced with `redacted@example.com`
-   - Private repository URLs are anonymized
+1. **Header Exclusion**: Sensitive headers are automatically excluded from recordings:
+   - `authorization`, `x-github-token`, `cookie`, `set-cookie`, `x-api-key`
+   - Rate limiting headers, ETags, and other metadata headers
 
-3. **Safe Operations**: Only read operations are performed. State-modifying operations like `markAsRead` are skipped.
+2. **Response Redaction**: Sensitive data is automatically redacted:
+   - IDs replaced with placeholder values (`12345`, `redacted_id`)
+   - Timestamps normalized to `2023-01-01T00:00:00Z`
+   - Email addresses → `user@example.com`
+   - Real usernames/organizations → `example-user`/`example-org`
+   - Repository names → `example-user/example-repo`
+   - URLs and templates sanitized
+   - Personal information (names, locations, bios) anonymized
+
+3. **Flexible Security Controls**:
+   - **Default**: Full redaction for safe sharing and testing
+   - **Opt-out**: Use `--no-redaction` to disable redaction when real data is needed for debugging
+   - **Warning**: Clear console warnings when redaction is disabled
+
+4. **Safe Operations**: All recorded operations are read-only. No state modifications are performed on your GitHub account.
 
 ## What Gets Recorded
 
-The record command captures HTTP interactions for the following service methods:
+The record command captures HTTP interactions for comprehensive test coverage across all GitHub SDK services:
 
-**NotificationsService:**
-- `listForAuthenticatedUser` - Various parameter combinations
-- `getThread` - Sample thread ID (expected to fail with 404)
+**GitHubNotifications:**
+- `listForAuthenticatedUser` - Default, paginated, filtered, and empty list scenarios
+- `getThread` - Sample thread ID (expected 404 for error testing)
+- `markAsRead`, `markAllAsRead`, `markThreadAsRead` - Expected failures for read-only testing
 
-**RepositoriesService:**
-- `listForAuthenticatedUser` - Default and filtered
-- `get` - Both existing and non-existent repositories  
-- `listForUser` - Public user repositories
-- `listForOrg` - Organization repositories
+**GitHubRepositories:**
+- `listForAuthenticatedUser` - Default, filtered by type/sort, pagination scenarios
+- `get` - Both existing (`akoenig/effective`) and non-existent repositories for error testing
+- `listForUser` - Public user repositories with various filters
+- `listForOrg` - Organization repositories with sorting options
+
+**GitHubIssues (NEW):**
+- `listForRepository` - Default, closed issues, label filtering, error scenarios
+- `get` - Specific issues and non-existent issues for 404 testing
+- `create` - Test issue creation (uses `akoenig/effective` repository)
+- `update` - Issue modifications on created test issues
+- `listComments`, `createComment` - Comment operations
+- `addLabels`, `removeLabel` - Label management
+- All operations include comprehensive error testing
+
+**Repository Used for Testing:**
+- Primary: `akoenig/effective` (for actual operations)
+- Error testing: Non-existent repositories and issues for 404/422 responses
 
 ## Output
 
-Recordings are saved to: `./recordings/github-sdk/`
+Recordings are saved to: `./tests/recordings/`
 
 Each recording is a JSON file containing:
 - Request details (method, URL, headers, body)
-- Response details (status, headers, body)
+- Response details (status, headers, body) 
 - Metadata (timestamp, transaction ID)
+- Redacted sensitive data (when redaction is enabled)
+
+**Console Output:**
+The CLI provides detailed feedback during recording:
+```
+🎬 GitHub SDK Recording Script
+📁 Recordings will be saved to: ./tests/recordings
+🔧 Setting up HTTP recording layer...
+🔒 Data redaction enabled (use --no-redaction to disable)
+🎯 Recording selected services: issues, repositories
+
+📝 Recording IssuesService methods...
+  → listForRepository (akoenig/effective)
+  → get (issue #1)
+  → create (test issue)
+  ...
+
+📊 Recording Summary:
+✅ Successful recordings: 42
+❌ Failed recordings: 3
+```
 
 ## Development Workflow
 
 1. **Generate recordings** (one-time setup or when API changes):
    ```bash
+   # Record all services with redaction (safe for sharing)
    pnpm cli:record --token=your-token --clean
+   
+   # Record specific services only
+   pnpm cli:record --token=your-token --services issues --clean
+   
+   # Record with real data for debugging (use caution!)
+   pnpm cli:record --token=your-token --no-redaction --clean
    ```
 
 2. **Run tests in replay mode** (daily development):
@@ -177,6 +235,34 @@ Each recording is a JSON file containing:
    ```bash
    pnpm cli:clean --all
    ```
+
+## Modular Architecture
+
+The CLI has been refactored into a modular architecture for better maintainability:
+
+```
+cli/
+├── commands/
+│   └── record.ts           # Main command export (15 lines)
+└── lib/
+    ├── types.ts           # Shared TypeScript types
+    ├── config.ts          # Configuration constants  
+    ├── redaction.ts       # GitHub data redaction logic
+    ├── recording-layer.ts # HTTP recording layer setup
+    ├── recording-program.ts # Main program orchestration
+    ├── cli.ts            # CLI command definition
+    └── recorders/
+        ├── mod.ts         # Barrel exports
+        ├── notifications.ts # Notifications recording
+        ├── repositories.ts  # Repositories recording  
+        └── issues.ts       # Issues recording
+```
+
+**Benefits:**
+- **Separation of Concerns**: Each module has a single responsibility
+- **Maintainability**: Easy to find and modify specific functionality
+- **Testability**: Individual modules can be tested in isolation
+- **Reusability**: Components can be reused in other CLI commands
 
 ## Troubleshooting
 

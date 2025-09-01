@@ -1,4 +1,6 @@
 import { Schema } from 'effect'
+import { GitHub } from '../../Infrastructure/Schemas/GitHubSchemas.js'
+import { License } from '../ValueObjects/License.js'
 import { User } from './User.js'
 
 /**
@@ -20,8 +22,8 @@ export const Repository = Schema.Struct({
   // Basic properties
   private: Schema.Boolean,
   fork: Schema.Boolean,
-  description: Schema.NullOr(Schema.String),
-  language: Schema.NullOr(Schema.String),
+  description: GitHub.nullable(Schema.String),
+  language: GitHub.nullable(Schema.String),
   archived: Schema.Boolean,
   disabled: Schema.Boolean,
   visibility: Schema.String,
@@ -43,10 +45,10 @@ export const Repository = Schema.Struct({
   svnUrl: Schema.propertySignature(Schema.String).pipe(
     Schema.fromKey('svn_url'),
   ),
-  mirrorUrl: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
+  mirrorUrl: Schema.propertySignature(GitHub.nullable(Schema.String)).pipe(
     Schema.fromKey('mirror_url'),
   ),
-  homepage: Schema.NullOr(Schema.String),
+  homepage: GitHub.nullable(Schema.String),
 
   // Features and settings
   hasIssues: Schema.propertySignature(Schema.Boolean).pipe(
@@ -94,19 +96,56 @@ export const Repository = Schema.Struct({
   ),
 
   // Timestamps
-  pushedAt: Schema.propertySignature(Schema.NullOr(Schema.String)).pipe(
+  pushedAt: Schema.propertySignature(GitHub.nullableDate()).pipe(
     Schema.fromKey('pushed_at'),
   ),
-  createdAt: Schema.propertySignature(Schema.String).pipe(
+  createdAt: Schema.propertySignature(Schema.DateFromString).pipe(
     Schema.fromKey('created_at'),
   ),
-  updatedAt: Schema.propertySignature(Schema.String).pipe(
+  updatedAt: Schema.propertySignature(Schema.DateFromString).pipe(
     Schema.fromKey('updated_at'),
   ),
 
+  // Merge configuration (commonly used)
+  allowRebaseMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => true,
+  }).pipe(Schema.fromKey('allow_rebase_merge')),
+  allowSquashMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => true,
+  }).pipe(Schema.fromKey('allow_squash_merge')),
+  allowMergeCommit: Schema.optionalWith(Schema.Boolean, {
+    default: () => true,
+  }).pipe(Schema.fromKey('allow_merge_commit')),
+  allowAutoMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('allow_auto_merge')),
+  deleteBranchOnMerge: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('delete_branch_on_merge')),
+  allowUpdateBranch: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('allow_update_branch')),
+  allowForking: Schema.optional(Schema.Boolean).pipe(
+    Schema.fromKey('allow_forking'),
+  ),
+  webCommitSignoffRequired: Schema.optionalWith(Schema.Boolean, {
+    default: () => false,
+  }).pipe(Schema.fromKey('web_commit_signoff_required')),
+
+  // Repository permissions (commonly accessed)
+  permissions: Schema.optional(
+    Schema.Struct({
+      admin: Schema.Boolean,
+      maintain: Schema.Boolean,
+      push: Schema.Boolean,
+      triage: Schema.Boolean,
+      pull: Schema.Boolean,
+    }),
+  ),
+
   // Optional fields that may appear in some contexts
-  license: Schema.optional(Schema.NullOr(Schema.Any)), // License can be null or a complex object
-  topics: Schema.optional(Schema.Array(Schema.String)),
+  license: GitHub.nullable(License),
+  topics: GitHub.optionalArray(Schema.String),
   isTemplate: Schema.optionalWith(Schema.Boolean, {
     default: () => false,
   }).pipe(Schema.fromKey('is_template')),

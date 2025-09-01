@@ -1,0 +1,206 @@
+import { Effect, Option, type ParseResult, Schema } from 'effect'
+import * as EffectArray from 'effect/Array'
+import {
+  ApiError,
+  type AuthError,
+  type HttpError,
+  RepositoryError,
+} from '../Domain/Errors/index.js'
+import {
+  type ListResponseType,
+  Repository,
+  RepositoryListOptions,
+} from '../Domain/index.js'
+import { GitHubAuthService } from '../Infrastructure/Auth/GitHubAuthService.js'
+import { GitHubHttpClientService } from '../Infrastructure/Http/GitHubHttpClientService.js'
+import { normalizeGitHubNulls } from '../Infrastructure/Schemas/GitHubSchemas.js'
+
+type RepositoryServiceError =
+  | RepositoryError
+  | AuthError
+  | HttpError
+  | ApiError
+  | ParseResult.ParseError
+
+/**
+ * GitHub Repositories service implementing repository-related API endpoints
+ */
+export class GitHubRepositories extends Effect.Service<GitHubRepositories>()(
+  'GitHubRepositories',
+  {
+    effect: Effect.gen(function* () {
+      const httpClient = yield* GitHubHttpClientService
+      const auth = yield* GitHubAuthService
+
+      const listForAuthenticatedUser = (
+        options: RepositoryListOptions = {},
+      ): Effect.Effect<
+        ListResponseType<Schema.Schema.Type<typeof Repository>>,
+        RepositoryServiceError
+      > =>
+        Effect.gen(function* () {
+          const authHeaders = yield* auth.getAuthHeaders()
+
+          // Encode camelCase options to snake_case for GitHub API
+          const encodedOptions = yield* Schema.encode(RepositoryListOptions)(
+            options,
+          )
+          const searchParams = Object.fromEntries(
+            Object.entries(encodedOptions)
+              .filter(([, value]) => value !== undefined)
+              .map(([key, value]) => [key, String(value)]),
+          )
+
+          const rawRepositories = yield* httpClient
+            .get<unknown[]>('/user/repos', {
+              headers: authHeaders,
+              searchParams,
+            })
+            .pipe(
+              Effect.mapError((error) => {
+                if (error instanceof ApiError && error.status === 404) {
+                  return new RepositoryError({
+                    message: 'No repositories found for authenticated user',
+                    operation: 'list',
+                  })
+                }
+                return error
+              }),
+            )
+
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepositories)
+          const repositories = yield* Schema.decodeUnknown(
+            Schema.Array(Repository),
+          )(normalizedData)
+
+          return {
+            data: EffectArray.isNonEmptyReadonlyArray(repositories)
+              ? Option.some(repositories)
+              : Option.none(),
+          }
+        })
+
+      const get = (
+        owner: string,
+        repo: string,
+      ): Effect.Effect<
+        Schema.Schema.Type<typeof Repository>,
+        RepositoryServiceError
+      > =>
+        Effect.gen(function* () {
+          const authHeaders = yield* auth.getAuthHeaders()
+
+          const rawRepository = yield* httpClient
+            .get<unknown>(`/repos/${owner}/${repo}`, {
+              headers: authHeaders,
+            })
+            .pipe(
+              Effect.mapError((error) => {
+                if (error instanceof ApiError && error.status === 404) {
+                  return new RepositoryError({
+                    message: `Repository ${owner}/${repo} not found`,
+                    repository: `${owner}/${repo}`,
+                    operation: 'get',
+                  })
+                }
+                return error
+              }),
+            )
+
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepository)
+          return yield* Schema.decodeUnknown(Repository)(normalizedData)
+        })
+
+      const listForUser = (
+        username: string,
+        options: RepositoryListOptions = {},
+      ): Effect.Effect<
+        ListResponseType<Schema.Schema.Type<typeof Repository>>,
+        RepositoryServiceError
+      > =>
+        Effect.gen(function* () {
+          const authHeaders = yield* auth.getAuthHeaders()
+
+          // Encode camelCase options to snake_case for GitHub API
+          const encodedOptions = yield* Schema.encode(RepositoryListOptions)(
+            options,
+          )
+          const searchParams = Object.fromEntries(
+            Object.entries(encodedOptions)
+              .filter(([, value]) => value !== undefined)
+              .map(([key, value]) => [key, String(value)]),
+          )
+
+          const rawRepositories = yield* httpClient.get<unknown[]>(
+            `/users/${username}/repos`,
+            {
+              headers: authHeaders,
+              searchParams,
+            },
+          )
+
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepositories)
+          const repositories = yield* Schema.decodeUnknown(
+            Schema.Array(Repository),
+          )(normalizedData)
+
+          return {
+            data: EffectArray.isNonEmptyReadonlyArray(repositories)
+              ? Option.some(repositories)
+              : Option.none(),
+          }
+        })
+
+      const listForOrg = (
+        org: string,
+        options: RepositoryListOptions = {},
+      ): Effect.Effect<
+        ListResponseType<Schema.Schema.Type<typeof Repository>>,
+        RepositoryServiceError
+      > =>
+        Effect.gen(function* () {
+          const authHeaders = yield* auth.getAuthHeaders()
+
+          // Encode camelCase options to snake_case for GitHub API
+          const encodedOptions = yield* Schema.encode(RepositoryListOptions)(
+            options,
+          )
+          const searchParams = Object.fromEntries(
+            Object.entries(encodedOptions)
+              .filter(([, value]) => value !== undefined)
+              .map(([key, value]) => [key, String(value)]),
+          )
+
+          const rawRepositories = yield* httpClient.get<unknown[]>(
+            `/orgs/${org}/repos`,
+            {
+              headers: authHeaders,
+              searchParams,
+            },
+          )
+
+          // Normalize null values to undefined and decode snake_case response to camelCase
+          const normalizedData = normalizeGitHubNulls(rawRepositories)
+          const repositories = yield* Schema.decodeUnknown(
+            Schema.Array(Repository),
+          )(normalizedData)
+
+          return {
+            data: EffectArray.isNonEmptyReadonlyArray(repositories)
+              ? Option.some(repositories)
+              : Option.none(),
+          }
+        })
+
+      return {
+        listForAuthenticatedUser,
+        get,
+        listForUser,
+        listForOrg,
+      }
+    }),
+  },
+) {}
